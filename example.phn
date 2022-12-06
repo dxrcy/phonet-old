@@ -1,16 +1,16 @@
-: C p|b|t|d|k|g|m|n|f|v|s|z|c|w|j|l
-: V i|u|e|o|a
-: S s|c
+C  [pbtdkgmnfvszcwjl]
+V  [iueoa]
+S  [sc]
 
 ###
 
-# Invalid syllable structure
-! VSC
+# @ Invalid syllable structure
+# ! VSC
 
-# 3 or more consonants sequentially
+@ 3 or more consonants sequentially
 ! C{3}
 
-# General invalid structure
+@ General invalid structure
 ^ S? ( C l? V n? )+ $
 
 ###

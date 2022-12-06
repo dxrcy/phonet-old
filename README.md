@@ -7,4 +7,5 @@ Validates phonotactic patterns for conlangs.
 - Extract patterns, classes, and tests from file
 - Pass input file from cli
 - Create binary
+- Change default reasons for invalid
 - Recursive class unfolding

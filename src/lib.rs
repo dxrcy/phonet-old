@@ -18,14 +18,18 @@ pub fn run_tests(scheme: Scheme) {
   let mut fails = 0;
   for (intent, word) in scheme.tests {
     // Validate word against patterns, get reason for invalid
-    let reason = validate(&word, &scheme.patterns, &scheme.classes);
+    let reason = validate(&word, &scheme.patterns);
 
     // Check if test result matches intended result
     let passed = !(reason.is_valid() ^ intent);
 
     // Define reason for test fail
     let fail_reason = if !passed {
-      reason.unwrap_or("Should NOT have matched".to_string())
+      reason.unwrap_or(
+        //TODO Change these
+        "\x1b[33mMatched when it should have not\x1b[0m".to_string(),
+        "No reason given".to_string(),
+      )
     } else {
       String::new()
     };
@@ -54,10 +58,10 @@ pub fn run_tests(scheme: Scheme) {
 
 /// State of pattern match of word
 ///
-/// If invalid, reason must be provided
+/// If invalid, reason can be provided
 enum ValidState {
   Valid,
-  Invalid(String),
+  Invalid(Option<String>),
 }
 
 impl ValidState {
@@ -70,12 +74,117 @@ impl ValidState {
   }
 
   /// Unwrap reason with default
-  pub fn unwrap_or(self, default: String) -> String {
+  pub fn unwrap_or(self, if_valid: String, if_none: String) -> String {
     if let Invalid(reason) = self {
-      return reason;
+      return match reason {
+        Some(reason) => reason,
+        None => if_none,
+      };
     }
-    default
+    if_valid
   }
+}
+
+/// Check if string is valid with patterns
+fn validate(word: &str, patterns: &Patterns) -> ValidState {
+  // Check for match with every pattern, if not, return reason
+  for (should_match, pattern, reason) in patterns {
+    let re = Regex::new(&pattern.replace(" ", "")).expect("Could not parse regex");
+    // Check if pattern matches, and whether match signifies returning invalid or continuing
+    if should_match ^ re.is_match(word) {
+      return Invalid(reason.clone());
+    }
+  }
+
+  Valid
+}
+
+type Classes = HashMap<char, String>;
+type Patterns = Vec<(bool, String, Option<String>)>;
+type Tests = Vec<(bool, String)>;
+
+#[derive(Debug)]
+pub struct Scheme {
+  patterns: Patterns,
+  tests: Tests,
+}
+
+pub fn parse(file: &str) -> Result<Scheme, String> {
+  let mut classes = Classes::new();
+  let mut patterns = Patterns::new();
+  let mut pattern_reason: Option<String> = None;
+  let mut tests = Tests::new();
+
+  let mut section: u32 = 0;
+
+  for line in file.lines() {
+    let line = line.trim();
+
+    if line.starts_with("###") {
+      section += 1;
+    }
+
+    if line.is_empty() || line.starts_with('#') {
+      continue;
+    }
+
+    match section {
+      // Classes
+      0 => {
+        let mut chars = line.chars();
+        if let Some(name) = chars.next() {
+          let value = chars.as_str().trim();
+          classes.insert(name, value.to_string());
+        }
+      }
+
+      // Patterns
+      1 => {
+        if line.starts_with('@') {
+          pattern_reason = Some(remove_first_char(line).trim().to_string());
+          continue;
+        }
+
+        if line.starts_with('!') {
+          patterns.push((
+            false,
+            remove_first_char(&line).replace(" ", ""),
+            pattern_reason,
+          ));
+        } else {
+          patterns.push((true, line.replace(" ", ""), pattern_reason));
+        }
+
+        pattern_reason = None;
+      }
+
+      // Tests
+      2 => {
+        let mut chars = line.chars();
+
+        let intent = match chars.next() {
+          Some('0') => false,
+          Some('1') => true,
+          Some(ch) => {
+            return Err(format!(
+              "Unknown test intent `{ch}`. Must be `0` (invalid) or `1` (valid)"
+            ))
+          }
+          None => continue,
+        };
+
+        tests.push((intent, chars.as_str().trim().to_string()));
+      }
+
+      _ => return Err("Unknown section. There should only be 3 sections".to_string()),
+    }
+  }
+
+  for i in &mut patterns {
+    i.1 = format(&i.1, &classes);
+  }
+
+  Ok(Scheme { patterns, tests })
 }
 
 /// Format regex pattern with components
@@ -86,81 +195,17 @@ fn format(pattern: &str, classes: &Classes) -> String {
   for ch in pattern.chars() {
     // Replace class with value if exists
     if ch.is_uppercase() {
-      new = new.replace(
-        ch,
-        classes.get(&ch).expect(&format!("Unknown class '{ch}'")),
-      );
+      let value = classes.get(&ch).expect(&format!("Unknown class '{ch}'"));
+      new = new.replace(ch, &format!("({})", value));
     }
   }
 
   new
 }
 
-/// Check if string is valid with patterns
-fn validate(word: &str, patterns: &Patterns, classes: &Classes) -> ValidState {
-  // Check for match with every pattern, if not, return reason
-  for (should_match, pattern, reason) in patterns {
-    let re =
-      Regex::new(&format(&pattern, classes).replace(" ", "")).expect("Could not parse regex");
-    // Check if pattern matches, and whether match signifies returning invalid or continuing
-    if should_match ^ re.is_match(word) {
-      return Invalid(reason.to_string());
-    }
-  }
-
-  Valid
-}
-
-type Classes = HashMap<char, String>;
-type Patterns = Vec<(bool, String, String)>;
-
-pub struct Scheme {
-  classes: Classes,
-  patterns: Patterns,
-  tests: Vec<(bool, String)>,
-}
-
-pub fn parse(_file: &str) -> Result<Scheme, String> {
-  let classes = common_macros::hash_map! {
-    'C' => "(p|b|t|d|k|g|m|n|f|v|s|z|c|w|j|l)".to_string(),
-    'V' => "(i|u|e|o|a)".to_string(),
-    'S' => "(s|c)".to_string(),
-  };
-
-  let patterns = vec![
-    (
-      false,
-      "VSC".to_string(),
-      "Invalid syllable structure".to_string(),
-    ),
-    (
-      false,
-      "C{3}".to_string(),
-      "3 or more consonants sequentially".to_string(),
-    ),
-    (
-      true,
-      "^ S? ( C l? V n? )+ $".to_string(),
-      "General invalid structure".to_string(),
-    ),
-  ];
-
-  let tests = vec![
-    (true, "tanta".to_string()),
-    (true, "panta".to_string()),
-    (true, "panka".to_string()),
-    (false, "pania".to_string()),
-    (true, "spato".to_string()),
-    (true, "spato".to_string()),
-    (false, "splatlo".to_string()),
-    (false, "splanto".to_string()),
-    (false, "splasto".to_string()),
-    (false, "splantlo".to_string()),
-  ];
-
-  Ok(Scheme {
-    classes,
-    patterns,
-    tests,
-  })
+/// Remove first character of string slice
+fn remove_first_char<'a>(s: &'a str) -> &'a str {
+  let mut chars = s.chars();
+  chars.next();
+  chars.as_str()
 }
