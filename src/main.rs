@@ -9,8 +9,6 @@ fn main() {
   let file = fs::read_to_string(args.file).expect("Could not read file");
   let scheme = Scheme::parse(&file).expect("Could not parse file");
 
-  println!("{scheme:#?}");
-
   if scheme.tests.len() > 0 {
     run_tests(scheme);
   } else {
