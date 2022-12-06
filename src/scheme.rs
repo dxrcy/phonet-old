@@ -103,7 +103,10 @@ impl Scheme {
             };
 
             // Add test
-            tests.push((intent, chars.as_str().trim().to_string()))
+            let word = chars.as_str().trim().to_string();
+            if !word.is_empty() {
+              tests.push((intent, word))
+            }
           }
 
           // Unknown
