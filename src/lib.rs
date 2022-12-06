@@ -2,7 +2,7 @@ use regex::Regex;
 
 use std::collections::HashMap;
 
-use ValidState::*;
+use Validity::*;
 
 /// Run tests, output result
 pub fn run_tests(scheme: Scheme) {
@@ -56,15 +56,29 @@ pub fn run_tests(scheme: Scheme) {
   }
 }
 
+/// Check if string is valid with patterns
+fn validate(word: &str, patterns: &Patterns) -> Validity {
+  // Check for match with every pattern, if not, return reason
+  for (should_match, pattern, reason) in patterns {
+    let re = Regex::new(&pattern.replace(" ", "")).expect("Could not parse regex");
+    // Check if pattern matches, and whether match signifies returning invalid or continuing
+    if should_match ^ re.is_match(word) {
+      return Invalid(reason.clone());
+    }
+  }
+
+  Valid
+}
+
 /// State of pattern match of word
 ///
 /// If invalid, reason can be provided
-enum ValidState {
+enum Validity {
   Valid,
   Invalid(Option<String>),
 }
 
-impl ValidState {
+impl Validity {
   /// Returns `true` if state is `Valid`
   pub fn is_valid(&self) -> bool {
     if let Valid = self {
@@ -85,122 +99,123 @@ impl ValidState {
   }
 }
 
-/// Check if string is valid with patterns
-fn validate(word: &str, patterns: &Patterns) -> ValidState {
-  // Check for match with every pattern, if not, return reason
-  for (should_match, pattern, reason) in patterns {
-    let re = Regex::new(&pattern.replace(" ", "")).expect("Could not parse regex");
-    // Check if pattern matches, and whether match signifies returning invalid or continuing
-    if should_match ^ re.is_match(word) {
-      return Invalid(reason.clone());
-    }
-  }
-
-  Valid
-}
-
+/// Alias for hashmap of class name and value
 type Classes = HashMap<char, String>;
+/// Alias for vector of patterns (intent, expression, and invalidity reason)
 type Patterns = Vec<(bool, String, Option<String>)>;
+/// Alias for vector of tests (intent and value)
 type Tests = Vec<(bool, String)>;
 
 #[derive(Debug)]
+/// Scheme parsed from file
+///
+/// Holds patterns and tests
 pub struct Scheme {
   patterns: Patterns,
   tests: Tests,
 }
 
-pub fn parse(file: &str) -> Result<Scheme, String> {
-  let mut classes = Classes::new();
-  let mut patterns = Patterns::new();
-  let mut pattern_reason: Option<String> = None;
-  let mut tests = Tests::new();
+impl Scheme {
+  /// Parse `Scheme` from file
+  pub fn parse(file: &str) -> Result<Scheme, String> {
+    // Builders
+    let mut classes = Classes::new();
+    let mut patterns = Patterns::new();
+    let mut pattern_reason: Option<String> = None;
+    let mut tests = Tests::new();
 
-  let mut section: u32 = 0;
+    let mut section: u8 = 0; // Should be between 0-2
+    for line in file.lines() {
+      let line = line.trim();
 
-  for line in file.lines() {
-    let line = line.trim();
-
-    if line.starts_with("###") {
-      section += 1;
-    }
-
-    if line.is_empty() || line.starts_with('#') {
-      continue;
-    }
-
-    match section {
-      // Classes
-      0 => {
-        let mut chars = line.chars();
-        if let Some(name) = chars.next() {
-          let value = chars.as_str().trim();
-          classes.insert(name, value.to_string());
-        }
+      // Section divider
+      if line.starts_with("###") {
+        section += 1;
       }
 
-      // Patterns
-      1 => {
-        if line.starts_with('@') {
-          pattern_reason = Some(remove_first_char(line).trim().to_string());
-          continue;
-        }
-
-        if line.starts_with('!') {
-          patterns.push((
-            false,
-            remove_first_char(&line).replace(" ", ""),
-            pattern_reason,
-          ));
-        } else {
-          patterns.push((true, line.replace(" ", ""), pattern_reason));
-        }
-
-        pattern_reason = None;
+      // Continue for blank or comment line
+      if line.is_empty() || line.starts_with('#') {
+        continue;
       }
 
-      // Tests
-      2 => {
-        let mut chars = line.chars();
-
-        let intent = match chars.next() {
-          Some('0') => false,
-          Some('1') => true,
-          Some(ch) => {
-            return Err(format!(
-              "Unknown test intent `{ch}`. Must be `0` (invalid) or `1` (valid)"
-            ))
+      match section {
+        // Classes
+        0 => {
+          let mut chars = line.chars();
+          if let Some(name) = chars.next() {
+            let value = chars.as_str().trim();
+            classes.insert(name, value.to_string());
           }
-          None => continue,
-        };
+        }
 
-        tests.push((intent, chars.as_str().trim().to_string()));
+        // Patterns
+        1 => {
+          // Define reason
+          if line.starts_with('@') {
+            pattern_reason = Some(remove_first_char(line).trim().to_string());
+            continue;
+          }
+
+          // Bang inverts match intent
+          if line.starts_with('!') {
+            // Should NOT match
+            patterns.push((
+              false,
+              remove_first_char(&line).replace(" ", ""),
+              pattern_reason,
+            ));
+          } else {
+            // Should match
+            patterns.push((true, line.replace(" ", ""), pattern_reason));
+          }
+          pattern_reason = None;
+        }
+
+        // Tests
+        2 => {
+          // Bang inverts validity intent
+          if line.starts_with('!') {
+            // Should be INVALID to pass
+            tests.push((false, remove_first_char(line).trim().to_string()));
+          } else {
+            // Should be VALID to pass
+            tests.push((true, line.to_string()));
+          }
+        }
+
+        // Unknown section
+        _ => return Err("Unknown section. There should only be 3 sections".to_string()),
       }
-
-      _ => return Err("Unknown section. There should only be 3 sections".to_string()),
     }
-  }
 
-  for i in &mut patterns {
-    i.1 = format(&i.1, &classes);
-  }
+    // Substitute classes in patterns
+    for i in &mut patterns {
+      i.1 = substitute_classes(&i.1, &classes)?;
+    }
 
-  Ok(Scheme { patterns, tests })
+    Ok(Scheme { patterns, tests })
+  }
 }
 
-/// Format regex pattern with components
+/// Substitute class names regex pattern with class values
 ///
 /// TODO Recursive class unfolding - break loop and repeat on replace
-fn format(pattern: &str, classes: &Classes) -> String {
+fn substitute_classes(pattern: &str, classes: &Classes) -> Result<String, String> {
   let mut new = pattern.to_string();
   for ch in pattern.chars() {
     // Replace class with value if exists
     if ch.is_uppercase() {
-      let value = classes.get(&ch).expect(&format!("Unknown class '{ch}'"));
+      // Return error if class does not exist
+      let value = match classes.get(&ch) {
+        Some(x) => x,
+        None => return Err(format!("Unknown class `{ch}`")),
+      };
+
+      // Replace name with value (surrounded in round brackets to separate from rest of pattern)
       new = new.replace(ch, &format!("({})", value));
     }
   }
-
-  new
+  Ok(new)
 }
 
 /// Remove first character of string slice

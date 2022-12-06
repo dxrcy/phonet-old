@@ -17,20 +17,20 @@ S  [sc]
 
 # comment here
 
-1 tanta
+tanta
 
-1 panta
+panta
 
-1 panka
+panka
 
-0 pania
+! pania
 #other comment
-1 spato
+spato
 
-1 spato
-0 splatlo
-0 splanto
+ spato
+! splatlo
+! splanto
 
-0 splasto
+! splasto
 
-0 splantlo
+! splantlo
