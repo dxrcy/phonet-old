@@ -4,9 +4,9 @@ Validates phonotactic patterns for conlangs.
 
 ## TODO
 
-- Pass input file from cli
 - Create binary
 - Change default reasons for invalid
 - Recursive class unfolding
+- Use error enum
 - Add docs !
 - Add tests !

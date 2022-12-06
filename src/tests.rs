@@ -1,5 +1,3 @@
-use regex::Regex;
-
 use super::{
   Patterns, Scheme,
   Validity::{self, *},
@@ -61,9 +59,8 @@ pub fn run_tests(scheme: Scheme) {
 fn validate_test(word: &str, patterns: &Patterns) -> Validity {
   // Check for match with every pattern, if not, return reason
   for (should_match, pattern, reason) in patterns {
-    let re = Regex::new(&pattern.replace(" ", "")).expect("Could not parse regex");
     // Check if pattern matches, and whether match signifies returning invalid or continuing
-    if should_match ^ re.is_match(word) {
+    if should_match ^ pattern.is_match(word) {
       return Invalid(reason.clone());
     }
   }

@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use regex::Regex;
+
 use super::{Patterns, Tests};
 
 /// Alias for hashmap of class name and value
@@ -19,7 +21,7 @@ impl Scheme {
   pub fn parse(file: &str) -> Result<Scheme, String> {
     // Builders
     let mut classes = Classes::new();
-    let mut patterns = Patterns::new();
+    let mut patterns_raw = Vec::new();
     let mut pattern_reason: Option<String> = None;
     let mut tests = Tests::new();
 
@@ -58,14 +60,14 @@ impl Scheme {
           // Bang inverts match intent
           if line.starts_with('!') {
             // Should NOT match
-            patterns.push((
+            patterns_raw.push((
               false,
               remove_first_char(&line).replace(" ", ""),
               pattern_reason,
             ));
           } else {
             // Should match
-            patterns.push((true, line.replace(" ", ""), pattern_reason));
+            patterns_raw.push((true, line.replace(" ", ""), pattern_reason));
           }
           pattern_reason = None;
         }
@@ -88,8 +90,14 @@ impl Scheme {
     }
 
     // Substitute classes in patterns
-    for i in &mut patterns {
-      i.1 = substitute_classes(&i.1, &classes)?;
+    let mut patterns = Patterns::new();
+    for (intent, pattern, reason) in patterns_raw {
+      let re = match Regex::new(&substitute_classes(&pattern, &classes)?) {
+        Ok(x) => x,
+        Err(err) => return Err(err.to_string()),
+      };
+
+      patterns.push((intent, re, reason));
     }
 
     Ok(Scheme { patterns, tests })

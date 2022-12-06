@@ -1,3 +1,5 @@
+use regex::Regex;
+
 mod args;
 mod scheme;
 mod tests;
@@ -8,7 +10,7 @@ pub use tests::run_tests;
 use Validity::*;
 
 /// Alias for vector of patterns (intent, expression, and invalidity reason)
-type Patterns = Vec<(bool, String, Option<String>)>;
+type Patterns = Vec<(bool, Regex, Option<String>)>;
 /// Alias for vector of tests (intent and value)
 type Tests = Vec<(bool, String)>;
 
