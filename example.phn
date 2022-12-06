@@ -1,36 +1,32 @@
-C  [pbtdkgmnfvszcwjl]
-V  [iueoa]
-S  [sc]
-
-###
+$C [pbtdkgmnfvszcwjl]
+$V [iueoa]
+$S [sc]
 
 # @ Invalid syllable structure
 # ! VSC
 
 @ 3 or more consonants sequentially
-! C{3}
+&! C{3}
 
 @ General invalid structure
-^ S? ( C l? V n? )+ $
-
-###
+& ^ S? ( C l? V n? )+ $
 
 # comment here
 
-tanta
+* tanta
 
-panta
+* panta
 
-panka
+* panka
 
-! pania
+*! pania
 #other comment
-spato
+*spato
 
- spato
-! splatlo
-! splanto
+ *spato
+*! splatlo
+*! splanto
 
-! splasto
+*! splasto
 
-! splantlo
+*! splantlo

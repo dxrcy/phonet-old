@@ -25,67 +25,65 @@ impl Scheme {
     let mut pattern_reason: Option<String> = None;
     let mut tests = Tests::new();
 
-    let mut section: u8 = 0; // Should be between 0-2
     for line in file.lines() {
       let line = line.trim();
 
-      // Section divider
-      if line.starts_with("###") {
-        section += 1;
-      }
-
-      // Continue for blank or comment line
-      if line.is_empty() || line.starts_with('#') {
+      // Continue for blank
+      if line.is_empty() {
         continue;
       }
 
-      match section {
-        // Classes
-        0 => {
-          let mut chars = line.chars();
-          if let Some(name) = chars.next() {
-            let value = chars.as_str().trim();
-            classes.insert(name, value.to_string());
-          }
-        }
+      let mut chars = line.chars();
 
-        // Patterns
-        1 => {
-          // Define reason
-          if line.starts_with('@') {
-            pattern_reason = Some(remove_first_char(line).trim().to_string());
+      if let Some(first) = chars.next() {
+        match first {
+          // Comment
+          '#' => continue,
+
+          // Classes
+          '$' => {
+            if let Some(name) = chars.next() {
+              let value = chars.as_str().trim();
+              classes.insert(name, value.to_string());
+            }
+          }
+
+          // Define pattern reason
+          '@' => {
+            pattern_reason = Some(chars.as_str().trim().to_string());
             continue;
           }
 
-          // Bang inverts match intent
-          if line.starts_with('!') {
-            // Should NOT match
-            patterns_raw.push((
-              false,
-              remove_first_char(&line).replace(" ", ""),
-              pattern_reason,
-            ));
-          } else {
-            // Should match
-            patterns_raw.push((true, line.replace(" ", ""), pattern_reason));
+          // Patterns
+          '&' => {
+            // Bang inverts match intent
+            if chars.as_str().starts_with('!') {
+              chars.next();
+              // Should NOT match
+              patterns_raw.push((false, chars.as_str().replace(" ", ""), pattern_reason));
+            } else {
+              // Should match
+              patterns_raw.push((true, chars.as_str().replace(" ", ""), pattern_reason));
+            }
+            pattern_reason = None;
           }
-          pattern_reason = None;
-        }
 
-        // Tests
-        2 => {
-          // Bang inverts validity intent
-          if line.starts_with('!') {
-            // Should be INVALID to pass
-            tests.push((false, remove_first_char(line).trim().to_string()));
-          } else {
-            // Should be VALID to pass
-            tests.push((true, line.to_string()));
+          // Tests
+          '*' => {
+            // Bang inverts validity intent
+            if chars.as_str().starts_with('!') {
+              chars.next();
+              // Should be INVALID to pass
+              tests.push((false, chars.as_str().trim().to_string()));
+            } else {
+              // Should be VALID to pass
+              tests.push((true, chars.as_str().trim().to_string()));
+            }
           }
-        }
 
-        // Unknown section
-        _ => return Err("Unknown section. There should only be 3 sections".to_string()),
+          // Unknown
+          _ => return Err(format!("Unknown line operator `{first}`")),
+        }
       }
     }
 
@@ -126,7 +124,7 @@ fn substitute_classes(pattern: &str, classes: &Classes) -> Result<String, String
 }
 
 /// Remove first character of string slice
-fn remove_first_char<'a>(s: &'a str) -> &'a str {
+fn _remove_first_char<'a>(s: &'a str) -> &'a str {
   let mut chars = s.chars();
   chars.next();
   chars.as_str()
