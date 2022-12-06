@@ -20,7 +20,7 @@ Options:
 
 # File syntax
 
-A `.phn` file is used to define the patterns, classes, and tests for the program.
+A `.phoner` file is used to define the patterns, classes, and tests for the program.
 
 The syntax is command based.
 A line can start with one of the following line operators:
@@ -54,9 +54,9 @@ Tests are checked against all patterns, and the result is displayed in the outpu
 
 ## Example
 
-Below is an example of a `.phn` file.
+Below is an example of a `.phoner` file.
 
-```phn
+```phoner
 # Consonants
 $C [pbtdkgmnfvszcwjl]
 # Vowels
