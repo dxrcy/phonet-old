@@ -93,6 +93,7 @@ $S [sʃ]
 
 # TODO
 
+- Add `@@` syntax for reasons which are used by all following patterns (until next reason is defined)
 - Change default reasons for invalid
 - Recursive class unfolding
 - Use error enum
