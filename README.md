@@ -8,14 +8,12 @@ It is compatible with either romanization and phonetic transcription.
 [Syntax Highlighting for VSCode](https://github.com/darccyy/phoner-syntax)
 
 ```
-Usage: phoner.exe <FILE>
-
-Arguments:
-  <FILE>  Path of file to parse and test
+Usage: phoner.exe [OPTIONS]
 
 Options:
-  -h, --help     Print help information
-  -V, --version  Print version information
+  -f, --file <FILE>  Path of file to parse and test [default: .phoner]
+  -h, --help         Print help information
+  -V, --version      Print version information
 ```
 
 # File syntax
