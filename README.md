@@ -28,10 +28,10 @@ A line can start with one of the following line operators:
 - `@` Commat: Describe a subsequent pattern. This is used as the _reason_ if a test fails
 - - `@@` Double Commat: A _useful_ reason, that is used by every following pattern before the next reason
 - `&` Ampersand: Define a [_pattern_](#patterns). Use `+` or `!` to identify _intent_
-- - `&+` Ampersand Bang: Defines a _positive pattern_ (Pattern must be followed for word to be valid)
+- - `&+` Ampersand Plus: Defines a _positive pattern_ (Pattern must be followed for word to be valid)
 - - `&!` Ampersand Bang: Defines a _negative pattern_ (Pattern must **not** be followed for word to be valid)
 - `*` Star: Creates a [_test_](#tests). Use `+` or `!` to identify _intent_
-- - `*+` Star Bang: Creates a _passing test_ (Word must be valid to pass)
+- - `*+` Star Plus: Creates a _passing test_ (Word must be valid to pass)
 - - `*!` Star Bang: Creates a _failing test_ (Word must **not** be valid to pass)
 
 ## Classes
@@ -49,7 +49,7 @@ Patterns must have a defined _intent_, either `+` for _positive_, or `!` for _ne
 - A _positive_ pattern must be followed for a word to be valid.
 - A _negative_ pattern must **not** be followed for a word to be valid.
 
-To use a [_class_], include the single capital letter name of the class.
+To use a [_class_](#classes), include the single capital letter name of the class.
 
 ## Tests
 
