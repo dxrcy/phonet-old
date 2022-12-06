@@ -1,7 +1,7 @@
 use std::fs;
 
 use clap::Parser;
-use phonotactics::{run_tests, Args, Scheme};
+use phoner::{run_tests, Args, Scheme};
 
 fn main() {
   let args = Args::parse();
