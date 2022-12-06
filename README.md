@@ -1,10 +1,20 @@
-# Phonotactics Validator
+# Phoner
 
-Validates phonotactic patterns for conlangs.
+Phoner is a CLI tool to validate phonotactic patterns for constructed languages.
+
+```
+Usage: phoner.exe <FILE>
+
+Arguments:
+  <FILE>  Path of file to parse and test
+
+Options:
+  -h, --help     Print help information
+  -V, --version  Print version information
+```
 
 ## TODO
 
-- Create binary
 - Change default reasons for invalid
 - Recursive class unfolding
 - Use error enum
