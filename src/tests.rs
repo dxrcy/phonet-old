@@ -40,9 +40,9 @@ pub fn run_tests(scheme: Scheme) {
 
     // Output single result
     println!(
-      "  \x1b[33m{intent}\x1b[0m {word}{space}  \x1b[1;{result} \x1b[0;3;1m{fail_reason}\x1b[0m",
+      "  \x1b[{intent}\x1b[0m {word}{space}  \x1b[1;{result} \x1b[0;3;1m{fail_reason}\x1b[0m",
       result = if passed { "32mpass" } else { "31mFAIL" },
-      intent = if intent { "✔" } else { "✗" },
+      intent = if intent { "36m✔" } else { "35m✗" },
       space = " ".repeat(max_word_len - word.len()),
     );
 
