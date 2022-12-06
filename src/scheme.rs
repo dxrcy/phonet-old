@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use regex::Regex;
+use fancy_regex::Regex;
 
 use super::{Patterns, Tests};
 

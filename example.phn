@@ -2,9 +2,6 @@ $C [pbtdkgmnfvszcwjl]
 $V [iueoa]
 $S [sc]
 
-# @ Invalid syllable structure
-# ! VSC
-
 @ 3 or more consonants sequentially
 &! C{3}
 

@@ -1,4 +1,4 @@
-use regex::Regex;
+use fancy_regex::Regex;
 
 mod args;
 mod scheme;

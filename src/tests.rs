@@ -60,7 +60,12 @@ fn validate_test(word: &str, patterns: &Patterns) -> Validity {
   // Check for match with every pattern, if not, return reason
   for (should_match, pattern, reason) in patterns {
     // Check if pattern matches, and whether match signifies returning invalid or continuing
-    if should_match ^ pattern.is_match(word) {
+    if should_match
+      ^ pattern
+        .is_match(word)
+        // ? Why is this a result ?
+        .expect("Failed checking match. This error should have been fixed :(")
+    {
       return Invalid(reason.clone());
     }
   }
