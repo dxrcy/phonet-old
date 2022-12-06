@@ -99,7 +99,7 @@ impl Scheme {
                 ))
               }
               // No character
-              None => return Err(format!("Test must contain characters")),
+              None => continue,
             };
 
             // Add test
