@@ -28,10 +28,12 @@ A line can start with one of the following line operators:
 - `#` Hashtag: A whole line comment
 - `$` Dollar: Define a [_class_](#classes)
 - `@` Commat: Describe a subsequent pattern. This is used as the _reason_ if a test fails
-- `&` Ampersand: Define a [_positive pattern_](#patterns)
-- - `&!` Ampersand Bang: Defines a _negative pattern_
-- `*` Star: Creates a [_passing test_](#tests)
-- - `*!` Star Bang: Creates a _failing test_
+- `&` Ampersand: Define a [_pattern_](#patterns). Use `+` or `!` to identify _intent_
+- - `&+` Ampersand Bang: Defines a _positive pattern_ (Pattern must be followed for word to be valid)
+- - `&!` Ampersand Bang: Defines a _negative pattern_ (Pattern must **not** be followed for word to be valid)
+- `*` Star: Creates a [_test_](#tests). Use `+` or `!` to identify _intent_
+- - `*+` Star Bang: Creates a _passing test_ (Word must be valid to pass)
+- - `*!` Star Bang: Creates a _failing test_ (Word must **not** be valid to pass)
 
 ## Classes
 
@@ -43,14 +45,21 @@ A class must be one capital letter.
 
 Patterns are Regular Expressions used to test if a word is valid.
 
-By default patterns are _positive_, so they must be followed for a word to be valid.
-A _negative_ pattern will must **not** be followed for a word to be valid.
+Patterns must have a defined _intent_, either `+` for _positive_, or `!` for _negative_.
+
+- A _positive_ pattern must be followed for a word to be valid.
+- A _negative_ pattern must **not** be followed for a word to be valid.
 
 To use a [_class_], include the single capital letter name of the class.
 
 ## Tests
 
 Tests are checked against all patterns, and the result is displayed in the output.
+
+Like [_patterns_](#patterns), tests must have a defined _intent_, either `+` for _positive_, or `!` for _negative_.
+
+- A _positive_ test will pass if it is valid.
+- A _negative_ test will **fail** if it is valid.
 
 ## Example
 
@@ -69,15 +78,15 @@ $S [sʃ]
 &! C{3}
 
 @ General invalid structure
-& ^ S? ( C l? V n? )+ $
+&+ ^ S? ( C l? V n? )+ $
 
 # Some words to test
-* tanta
-* panka
+*+ tanta
 *! pania
+*+ panka
 
 # Some other tests
-* spato
+*+spato
 *!splatlo
 *!lask
 ```

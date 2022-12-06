@@ -49,6 +49,7 @@ impl Scheme {
           }
 
           // Define pattern reason
+          //TODO Use '@@' for reason used by multiple patterns
           '@' => {
             pattern_reason = Some(chars.as_str().trim().to_string());
             continue;
@@ -56,29 +57,53 @@ impl Scheme {
 
           // Patterns
           '&' => {
-            // Bang inverts match intent
-            if chars.as_str().starts_with('!') {
-              chars.next();
-              // Should NOT match
-              patterns_raw.push((false, chars.as_str().replace(" ", ""), pattern_reason));
-            } else {
-              // Should match
-              patterns_raw.push((true, chars.as_str().replace(" ", ""), pattern_reason));
-            }
+            // Check intent
+            // `+` for true, `!` for false
+            let intent = match chars.next() {
+              // Should be INVALID to pass
+              Some('+') => true,
+              // Should be VALID to pass
+              Some('!') => false,
+
+              // Unknown character
+              Some(ch) => {
+                return Err(format!(
+                  "Unknown intent identifier `{ch}`. Must be either `+` or `!`"
+                ))
+              }
+              // No character
+              None => return Err(format!("Test must contain characters")),
+            };
+
+            // Add pattern
+            patterns_raw.push((intent, chars.as_str().replace(" ", ""), pattern_reason));
+
+            //TODO* Use '@@' for reason used by multiple patterns
             pattern_reason = None;
           }
 
           // Tests
           '*' => {
-            // Bang inverts validity intent
-            if chars.as_str().starts_with('!') {
-              chars.next();
+            // Check intent
+            // `+` for true, `!` for false
+            let intent = match chars.next() {
               // Should be INVALID to pass
-              tests.push((false, chars.as_str().trim().to_string()));
-            } else {
+              Some('+') => true,
               // Should be VALID to pass
-              tests.push((true, chars.as_str().trim().to_string()));
-            }
+              Some('!') => false,
+
+              // Unknown character
+              Some(ch) => {
+                return Err(format!(
+                  "Unknown intent identifier `{ch}`. Must be either `+` or `!`"
+                ))
+              }
+              // No character
+              None => return Err(format!("Test must contain characters")),
+            };
+
+            // Add test
+            tests.push((intent, chars.as_str().trim().to_string()))
           }
 
           // Unknown

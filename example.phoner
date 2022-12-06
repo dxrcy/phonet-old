@@ -5,22 +5,22 @@ $S [sc]
 @ 3 or more consonants sequentially
 &! C{3}
 
-@ General invalid structure
-& ^ S? ( C l? V n? )+ $
+@ Basic structure
+&+ ^ S? ( C l? V n? )+ $
 
 # comment here
 
-* tanta
+*+ tanta
 
-* panta
+*+ panta
 
-* panka
+*+ panka
 
 *! pania
 #other comment
-*spato
+*+spato
 
- *spato
+ *+spato
 *! splatlo
 *! splanto
 
