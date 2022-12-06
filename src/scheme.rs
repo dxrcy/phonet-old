@@ -21,9 +21,11 @@ impl Scheme {
   pub fn parse(file: &str) -> Result<Scheme, String> {
     // Builders
     let mut classes = Classes::new();
+    let mut tests = Tests::new();
+
     let mut patterns_raw = Vec::new();
     let mut pattern_reason: Option<String> = None;
-    let mut tests = Tests::new();
+    let mut is_useful_reason = false;
 
     for line in file.lines() {
       let line = line.trim();
@@ -49,8 +51,16 @@ impl Scheme {
           }
 
           // Define pattern reason
-          //TODO Use '@@' for reason used by multiple patterns
           '@' => {
+            // Use '@@' for reason used by multiple patterns
+            if Some('@') == chars.next() {
+              chars.next();
+              is_useful_reason = true;
+            } else {
+              is_useful_reason = false;
+            }
+
+            // Set reason
             pattern_reason = Some(chars.as_str().trim().to_string());
             continue;
           }
@@ -76,10 +86,16 @@ impl Scheme {
             };
 
             // Add pattern
-            patterns_raw.push((intent, chars.as_str().replace(" ", ""), pattern_reason));
+            patterns_raw.push((
+              intent,
+              chars.as_str().replace(" ", ""),
+              pattern_reason.clone(),
+            ));
 
-            //TODO* Use '@@' for reason used by multiple patterns
-            pattern_reason = None;
+            // Use '@@' for reason used by multiple patterns
+            if !is_useful_reason {
+              pattern_reason = None;
+            }
           }
 
           // Tests

@@ -26,6 +26,7 @@ A line can start with one of the following line operators:
 - `#` Hashtag: A whole line comment
 - `$` Dollar: Define a [_class_](#classes)
 - `@` Commat: Describe a subsequent pattern. This is used as the _reason_ if a test fails
+- - `@@` Double Commat: A _useful_ reason, that is used by every following pattern before the next reason
 - `&` Ampersand: Define a [_pattern_](#patterns). Use `+` or `!` to identify _intent_
 - - `&+` Ampersand Bang: Defines a _positive pattern_ (Pattern must be followed for word to be valid)
 - - `&!` Ampersand Bang: Defines a _negative pattern_ (Pattern must **not** be followed for word to be valid)
@@ -91,7 +92,6 @@ $S [sʃ]
 
 # TODO
 
-- Add `@@` syntax for reasons which are used by all following patterns (until next reason is defined)
 - Change default reasons for invalid
 - Recursive class unfolding
 - Use error enum
