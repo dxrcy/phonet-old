@@ -3,6 +3,8 @@
 Phoner is a CLI tool to validate phonotactic patterns for constructed languages.
 It is compatible with either romanization and phonetic transcription.
 
+[Download latest version here](https://github.com/darccyy/phoner/releases/latest)
+
 ```
 Usage: phoner.exe <FILE>
 
