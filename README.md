@@ -62,9 +62,7 @@ $V [iueoa]
 # Sibilants
 $S [sʃ]
 
-# @ Vowel before a sibilant
-# ! VS
-
+# Comment here
 @ 3 or more consonants sequentially
 &! C{3}
 
