@@ -1,9 +1,11 @@
+mod args;
+mod scheme;
+mod tests;
+
+pub use args::Args;
 pub use scheme::Scheme;
 pub use tests::run_tests;
 use Validity::*;
-
-mod scheme;
-mod tests;
 
 /// Alias for vector of patterns (intent, expression, and invalidity reason)
 type Patterns = Vec<(bool, String, Option<String>)>;

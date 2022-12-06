@@ -51,9 +51,9 @@ pub fn run_tests(scheme: Scheme) {
 
   // Output final result
   if fails == 0 {
-    println!("\n\x1b[32;3mAll tests pass!\x1b[0m");
+    println!("\n\x1b[32;3mAll tests pass!\x1b[0m\n");
   } else {
-    println!("\n\x1b[31;1;3m{fails} tests failed!\x1b[0m");
+    println!("\n\x1b[31;1;3m{fails} tests failed!\x1b[0m\n");
   }
 }
 
