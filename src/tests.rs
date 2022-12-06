@@ -5,6 +5,11 @@ use super::{
 
 /// Run tests, output result
 pub fn run_tests(scheme: Scheme) {
+  if scheme.tests.len() < 1 {
+    println!("\n\x1b[33mNo tests to run.\x1b[0m");
+    return;
+  }
+
   println!(
     "\n\x1b[3;33mRunning {} tests...\x1b[0m\n",
     scheme.tests.len()
@@ -49,9 +54,9 @@ pub fn run_tests(scheme: Scheme) {
 
   // Output final result
   if fails == 0 {
-    println!("\n\x1b[32;3mAll tests pass!\x1b[0m\n");
+    println!("\n\x1b[32;3mAll tests pass!\x1b[0m");
   } else {
-    println!("\n\x1b[31;1;3m{fails} tests failed!\x1b[0m\n");
+    println!("\n\x1b[31;1;3m{fails} tests failed!\x1b[0m");
   }
 }
 

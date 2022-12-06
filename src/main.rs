@@ -10,9 +10,5 @@ fn main() {
 
   let scheme = Scheme::parse(&file).expect("Could not parse file");
 
-  if scheme.tests.len() > 0 {
-    run_tests(scheme);
-  } else {
-    println!("\n\x1b[33mNo tests to run.\x1b[0m");
-  }
+  run_tests(scheme);
 }
