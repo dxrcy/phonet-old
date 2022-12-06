@@ -5,6 +5,8 @@ It is compatible with either romanization and phonetic transcription.
 
 [Download latest version here](https://github.com/darccyy/phoner/releases/latest)
 
+[Syntax Highlighting for VSCode](https://github.com/darccyy/phoner-syntax)
+
 ```
 Usage: phoner.exe <FILE>
 
