@@ -5,6 +5,6 @@ Validates phonotactic patterns for conlangs.
 ## TODO
 
 - Extract patterns, classes, and tests from file
-- - patterns, classes: `patterns.phn`
-- - tests: `tests.txt`
+- Pass input file from cli
+- Create binary
 - Recursive class unfolding

@@ -1,0 +1,36 @@
+: C p|b|t|d|k|g|m|n|f|v|s|z|c|w|j|l
+: V i|u|e|o|a
+: S s|c
+
+###
+
+# Invalid syllable structure
+! VSC
+
+# 3 or more consonants sequentially
+! C{3}
+
+# General invalid structure
+^ S? ( C l? V n? )+ $
+
+###
+
+# comment here
+
+1 tanta
+
+1 panta
+
+1 panka
+
+0 pania
+#other comment
+1 spato
+
+1 spato
+0 splatlo
+0 splanto
+
+0 splasto
+
+0 splantlo
