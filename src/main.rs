@@ -10,8 +10,8 @@ fn main() {
 
   let mut scheme = Scheme::parse(&file).expect("Could not parse file");
 
-  if let Some(test) = args.test {
-    scheme.tests = vec![(true, test)];
+  if let Some(tests) = args.tests {
+    scheme.tests = tests.split(',').map(|x| (true, x.to_string())).collect();
   }
 
   run_tests(scheme);

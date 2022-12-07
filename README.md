@@ -15,10 +15,10 @@ Help message:
 
 ```
 $ phoner -h
-Usage: phoner.exe [OPTIONS] [TEST]
+Usage: phoner.exe [OPTIONS] [TESTS]
 
 Arguments:
-  [TEST]  Custom test - Ignores tests in file
+  [TESTS]  Custom test, separate with comma (Ignores tests in file)
 
 Options:
   -f, --file <FILE>  Path of file to parse and test [default: .phoner]
@@ -141,7 +141,6 @@ $N [mn]
 
 # TODO
 
-- Accept multiple custom tests in arguments
 - Change default reasons for invalid
 - Recursive class unfolding
 - Use error enum
