@@ -8,7 +8,11 @@ fn main() {
 
   let file = fs::read_to_string(&args.file).expect(&format!("Could not read file '{}'", args.file));
 
-  let scheme = Scheme::parse(&file).expect("Could not parse file");
+  let mut scheme = Scheme::parse(&file).expect("Could not parse file");
+
+  if let Some(test) = args.test {
+    scheme.tests = vec![(true, test)];
+  }
 
   run_tests(scheme);
 }

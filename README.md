@@ -12,6 +12,7 @@ Usage: phoner.exe [OPTIONS]
 
 Options:
   -f, --file <FILE>  Path of file to parse and test [default: .phoner]
+  -t, --test <TEST>  Custom test - Ignores tests in file
   -h, --help         Print help information
   -V, --version      Print version information
 ```
@@ -92,6 +93,7 @@ $S [sʃ]
 
 # TODO
 
+- Accept multiple custom tests in arguments
 - Change default reasons for invalid
 - Recursive class unfolding
 - Use error enum
