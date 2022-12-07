@@ -7,6 +7,8 @@ It is compatible with either romanization and phonetic transcription.
 
 [Syntax Highlighting for VSCode](https://github.com/darccyy/phoner-syntax)
 
+This program is still in development, and is subject to change.
+
 ```
 Usage: phoner.exe [OPTIONS]
 
@@ -66,29 +68,68 @@ Like [_patterns_](#patterns), tests must have a defined _intent_, either `+` for
 Below is an example of a `.phoner` file.
 
 ```phoner
-# Consonants
-$C [pbtdkgmnfvszcwjl]
-# Vowels
 $V [iueoa]
-# Sibilants
-$S [sʃ]
+$C [pbtdkgmnfvszcwjl]
 
-# Comment here
-@ 3 or more consonants sequentially
+@ Contains invalid letters
+&+ ^ [VC]+ $
+
+$S [sc]
+$N [mn]
+
+@ Basic structure
+&+ ^ S? (C? V K?)+   $
+
+*+ pono
+*+ stono
+*+ slono
+*+ sonto
+*+ ato
+
+@ Any repeated letter
+# Backreference
+&! (.)\1{1,}
+
+*+ tanta
+*! atta
+*! taata
+
+@ More than 2 seq. consonants
 &! C{3}
 
-@ General invalid structure
-&+ ^ S? ( C l? V n? )+ $
+*+ apa
+*! aspla
+*! assa
+*! asssa
 
-# Some words to test
-*+ tanta
-*! pania
-*+ panka
+@ Sibilant before anything other than [ptkmnl]
+&! S[bdgfvszcwj]
 
-# Some other tests
-*+spato
-*!splatlo
-*!lask
+*+ spono
+*+ stono
+*! sbono
+*+ skono
+*+ smono
+*+ snono
+*+ cnono
+*+ cpono
+*! cgono
+
+@@ j|w beside i|u respectively
+&! ji
+&! ij
+&! wu
+&! uw
+
+*! aji
+*+ aju
+*! awu
+
+# Some more tests
+
+*+ telo
+*+ tenlo
+*! telno
 ```
 
 # TODO
