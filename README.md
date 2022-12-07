@@ -9,12 +9,19 @@ It is compatible with either romanization and phonetic transcription.
 
 This program is still in development, and is subject to change.
 
+# Command line use
+
+Help message:
+
 ```
-Usage: phoner.exe [OPTIONS]
+$ phoner -h
+Usage: phoner.exe [OPTIONS] [TEST]
+
+Arguments:
+  [TEST]  Custom test - Ignores tests in file
 
 Options:
   -f, --file <FILE>  Path of file to parse and test [default: .phoner]
-  -t, --test <TEST>  Custom test - Ignores tests in file
   -h, --help         Print help information
   -V, --version      Print version information
 ```
