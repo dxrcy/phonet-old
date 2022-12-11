@@ -141,8 +141,6 @@ $N [mn]
 
 # TODO
 
-- Change default reasons for invalid
-- Recursive class unfolding
 - Use error enum
 - Add docs !
 - Add tests !

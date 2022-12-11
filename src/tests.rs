@@ -30,8 +30,7 @@ pub fn run_tests(scheme: Scheme) {
     // Define reason for test fail
     let fail_reason = if !passed {
       reason.unwrap_or(
-        //TODO Change these
-        "\x1b[33mMatched when it should have not\x1b[0m".to_string(),
+        "\x1b[33mMatched, but should have not\x1b[0m".to_string(),
         "No reason given".to_string(),
       )
     } else {
