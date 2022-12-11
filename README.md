@@ -154,3 +154,16 @@ $N [mn]
 - Fix error handling
 - Add docs !
 - Add tests !
+
+## Experimental syntax
+
+```
+#* Reason
+&@ Reason
+
++ Positive rule
+! Negative rule
+
+% Message (for tests)
+#* Message
+```
