@@ -1,8 +1,31 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::Display};
 
 use fancy_regex::Regex;
 
 use super::{Patterns, Tests};
+use ParseError::*;
+
+/// Error enum for `Scheme`
+pub enum ParseError {
+  UnknownIntentIdentifier(char),
+  UnknownLineOperator(char),
+  UnknownClass(char),
+  RegexFail(fancy_regex::Error),
+}
+
+impl Display for ParseError {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    match self {
+      UnknownIntentIdentifier(ch) => write!(
+        f,
+        "Unknown intent identifier `{ch}`. Must be either `+` or `!`"
+      ),
+      UnknownLineOperator(ch) => write!(f, "Unknown line operator `{ch}`"),
+      UnknownClass(name) => write!(f, "Unknown class `{name}`"),
+      RegexFail(err) => write!(f, "Failed to parse Regex: {err}"),
+    }
+  }
+}
 
 /// Alias for hashmap of class name and value
 type Classes = HashMap<char, String>;
@@ -16,9 +39,10 @@ pub struct Scheme {
   pub tests: Tests,
 }
 
+//TODO Rename this
 impl Scheme {
   /// Parse `Scheme` from file
-  pub fn parse(file: &str) -> Result<Scheme, String> {
+  pub fn parse(file: &str) -> Result<Scheme, ParseError> {
     // Builders
     let mut classes = Classes::new();
     let mut tests = Tests::new();
@@ -77,9 +101,10 @@ impl Scheme {
 
               // Unknown character
               Some(ch) => {
-                return Err(format!(
-                  "Unknown intent identifier `{ch}`. Must be either `+` or `!`"
-                ))
+                return Err(UnknownIntentIdentifier(ch));
+                // return Err(format!(
+                //   "Unknown intent identifier `{ch}`. Must be either `+` or `!`"
+                // ))
               }
               // No character
               None => continue,
@@ -110,9 +135,10 @@ impl Scheme {
 
               // Unknown character
               Some(ch) => {
-                return Err(format!(
-                  "Unknown intent identifier `{ch}`. Must be either `+` or `!`"
-                ))
+                return Err(UnknownIntentIdentifier(ch));
+                // return Err(format!(
+                //   "Unknown intent identifier `{ch}`. Must be either `+` or `!`"
+                // ))
               }
               // No character
               None => continue,
@@ -126,7 +152,8 @@ impl Scheme {
           }
 
           // Unknown
-          _ => return Err(format!("Unknown line operator `{first}`")),
+          _ => return Err(UnknownLineOperator(first)),
+          // _ => return Err(format!("Unknown line operator `{first}`")),
         }
       }
     }
@@ -136,7 +163,7 @@ impl Scheme {
     for (intent, pattern, reason) in patterns_raw {
       let re = match Regex::new(&substitute_classes(&pattern, &classes)?) {
         Ok(x) => x,
-        Err(err) => return Err(err.to_string()),
+        Err(err) => return Err(RegexFail(err)),
       };
 
       patterns.push((intent, re, reason));
@@ -147,9 +174,7 @@ impl Scheme {
 }
 
 /// Substitute class names regex pattern with class values
-///
-/// TODO Recursive class unfolding - break loop and repeat on replace
-fn substitute_classes(pattern: &str, classes: &Classes) -> Result<String, String> {
+fn substitute_classes(pattern: &str, classes: &Classes) -> Result<String, ParseError> {
   let mut new = pattern.to_string();
   for ch in pattern.chars() {
     // Replace class with value if exists
@@ -157,7 +182,8 @@ fn substitute_classes(pattern: &str, classes: &Classes) -> Result<String, String
       // Return error if class does not exist
       let value = match classes.get(&ch) {
         Some(x) => x,
-        None => return Err(format!("Unknown class `{ch}`")),
+        None => return Err(UnknownClass(ch)),
+        // None => return Err(format!("Unknown class `{ch}`")),
       };
 
       // Replace name with value (surrounded in round brackets to separate from rest of pattern)

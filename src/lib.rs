@@ -5,8 +5,9 @@ mod scheme;
 mod tests;
 
 pub use args::Args;
-pub use scheme::Scheme;
+pub use scheme::{Scheme, ParseError};
 pub use tests::run_tests;
+
 use Validity::*;
 
 /// Alias for vector of patterns (intent, expression, and invalidity reason)
