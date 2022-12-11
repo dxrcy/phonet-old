@@ -166,10 +166,3 @@ fn substitute_classes(pattern: &str, classes: &Classes) -> Result<String, String
   }
   Ok(new)
 }
-
-/// Remove first character of string slice
-fn _remove_first_char<'a>(s: &'a str) -> &'a str {
-  let mut chars = s.chars();
-  chars.next();
-  chars.as_str()
-}
