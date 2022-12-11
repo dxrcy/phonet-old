@@ -2,7 +2,7 @@ use std::{collections::HashMap, fmt::Display};
 
 use fancy_regex::Regex;
 
-use super::{Patterns, Tests};
+use super::{Rules, Tests};
 use ParseError::*;
 
 /// Error enum for `Scheme`
@@ -33,9 +33,9 @@ type Classes = HashMap<char, String>;
 #[derive(Debug)]
 /// Scheme parsed from file
 ///
-/// Holds patterns and tests
+/// Holds rules and tests
 pub struct Scheme {
-  pub patterns: Patterns,
+  pub rules: Rules,
   pub tests: Tests,
 }
 
@@ -46,9 +46,8 @@ impl Scheme {
     // Builders
     let mut classes = Classes::new();
     let mut tests = Tests::new();
-
-    let mut patterns_raw = Vec::new();
-    let mut pattern_reason: Option<String> = None;
+    let mut rules_raw = Vec::new();
+    let mut rule_reason: Option<String> = None;
     let mut is_useful_reason = false;
 
     for line in file.lines() {
@@ -74,9 +73,9 @@ impl Scheme {
             }
           }
 
-          // Define pattern reason
+          // Define rule reason
           '@' => {
-            // Use '@@' for reason used by multiple patterns
+            // Use '@@' for reason used by multiple rules
             if Some('@') == chars.next() {
               chars.next();
               is_useful_reason = true;
@@ -85,11 +84,11 @@ impl Scheme {
             }
 
             // Set reason
-            pattern_reason = Some(chars.as_str().trim().to_string());
+            rule_reason = Some(chars.as_str().trim().to_string());
             continue;
           }
 
-          // Patterns
+          // Rules
           '&' => {
             // Check intent
             // `+` for true, `!` for false
@@ -110,16 +109,16 @@ impl Scheme {
               None => continue,
             };
 
-            // Add pattern
-            patterns_raw.push((
+            // Add rule
+            rules_raw.push((
               intent,
               chars.as_str().replace(" ", ""),
-              pattern_reason.clone(),
+              rule_reason.clone(),
             ));
 
-            // Use '@@' for reason used by multiple patterns
+            // Use '@@' for reason used by multiple rules
             if !is_useful_reason {
-              pattern_reason = None;
+              rule_reason = None;
             }
           }
 
@@ -158,25 +157,25 @@ impl Scheme {
       }
     }
 
-    // Substitute classes in patterns
-    let mut patterns = Patterns::new();
-    for (intent, pattern, reason) in patterns_raw {
-      let re = match Regex::new(&substitute_classes(&pattern, &classes)?) {
+    // Substitute classes in rule
+    let mut rules = Rules::new();
+    for (intent, rule, reason) in rules_raw {
+      let re = match Regex::new(&substitute_classes(&rule, &classes)?) {
         Ok(x) => x,
         Err(err) => return Err(RegexFail(err)),
       };
 
-      patterns.push((intent, re, reason));
+      rules.push((intent, re, reason));
     }
 
-    Ok(Scheme { patterns, tests })
+    Ok(Scheme { rules, tests })
   }
 }
 
-/// Substitute class names regex pattern with class values
-fn substitute_classes(pattern: &str, classes: &Classes) -> Result<String, ParseError> {
-  let mut new = pattern.to_string();
-  for ch in pattern.chars() {
+/// Substitute class names regex rule with class values
+fn substitute_classes(rule: &str, classes: &Classes) -> Result<String, ParseError> {
+  let mut new = rule.to_string();
+  for ch in rule.chars() {
     // Replace class with value if exists
     if ch.is_uppercase() {
       // Return error if class does not exist
@@ -186,7 +185,7 @@ fn substitute_classes(pattern: &str, classes: &Classes) -> Result<String, ParseE
         // None => return Err(format!("Unknown class `{ch}`")),
       };
 
-      // Replace name with value (surrounded in round brackets to separate from rest of pattern)
+      // Replace name with value (surrounded in round brackets to separate from rest of rule)
       new = new.replace(ch, &format!("({})", value));
     }
   }

@@ -10,12 +10,12 @@ pub use tests::run_tests;
 
 use Validity::*;
 
-/// Alias for vector of patterns (intent, expression, and invalidity reason)
-type Patterns = Vec<(bool, Regex, Option<String>)>;
+/// Alias for vector of rules (intent, expression, and invalidity reason)
+type Rules = Vec<(bool, Regex, Option<String>)>;
 /// Alias for vector of tests (intent and value)
 type Tests = Vec<(bool, String)>;
 
-/// State of pattern match of word
+/// State of rules match of word
 ///
 /// If invalid, reason can be provided
 enum Validity {

@@ -1,5 +1,5 @@
 use super::{
-  Patterns, Scheme,
+  Rules, Scheme,
   Validity::{self, *},
 };
 
@@ -21,8 +21,8 @@ pub fn run_tests(scheme: Scheme) {
   // Test each word, tally fails
   let mut fails = 0;
   for (intent, word) in scheme.tests {
-    // Validate word against patterns, get reason for invalid
-    let reason = validate_test(&word, &scheme.patterns);
+    // Validate word against rules, get reason for invalid
+    let reason = validate_test(&word, &scheme.rules);
 
     // Check if test result matches intended result
     let passed = !(reason.is_valid() ^ intent);
@@ -62,13 +62,13 @@ pub fn run_tests(scheme: Scheme) {
   }
 }
 
-/// Check if string is valid with patterns
-fn validate_test(word: &str, patterns: &Patterns) -> Validity {
-  // Check for match with every pattern, if not, return reason
-  for (should_match, pattern, reason) in patterns {
-    // Check if pattern matches, and whether match signifies returning invalid or continuing
+/// Check if string is valid with rules
+fn validate_test(word: &str, rules: &Rules) -> Validity {
+  // Check for match with every rule, if not, return reason
+  for (should_match, rule, reason) in rules {
+    // Check if rule matches, and whether match signifies returning invalid or continuing
     if should_match
-      ^ pattern
+      ^ rule
         .is_match(word)
         // ? Why is this a result ?
         .expect("Failed checking match. This error should have been fixed :(")
