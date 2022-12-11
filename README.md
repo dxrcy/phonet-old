@@ -158,12 +158,19 @@ $N [mn]
 ## Experimental syntax
 
 ```
-#* Reason
-&@ Reason
+$ Cx = ptk
 
-+ Positive rule
-! Negative rule
+@ reason
++ ( <Cx> a )+
+! <Cx> {2}
 
-% Message (for tests)
-#* Message
+# split at space
+# split at semicolon
+
+@* message
+*+ pata
+*+ pa ta
+
+@* other message
+*! xe ; *! xee
 ```
