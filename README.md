@@ -141,6 +141,6 @@ $N [mn]
 
 # TODO
 
-- Use error enum
+- Fix error handling
 - Add docs !
 - Add tests !
