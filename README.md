@@ -31,14 +31,14 @@ Arguments:
   [TESTS]  Custom test, separate with comma (Ignores tests in file)
 
 Options:
-  -f, --file <FILE>  Path of file to parse and test [default: .phoner]
+  -f, --file <FILE>  Path of file to parse and test [default: phoner]
   -h, --help         Print help information
   -V, --version      Print version information
 ```
 
 # File syntax
 
-A `.phoner` file is used to define the rules, classes, and tests for the program.
+A `phoner` file is used to define the rules, classes, and tests for the program.
 
 The syntax is command based.
 
@@ -84,7 +84,7 @@ Like [_rules_](#rules), tests must have a defined _intent_, either `+` for _posi
 
 ## Example
 
-Below is an example of a `.phoner` file.
+Below is an example of a `phoner` file.
 
 //TODO Update to new syntax!
 
