@@ -33,7 +33,7 @@ pub fn run_tests(scheme: Scheme) {
   let mut fails = 0;
   for test in scheme.tests {
     let (intent, word) = match test {
-      TestType::Message(msg) => {
+      TestType::Note(msg) => {
         println!("\x1b[34m{msg}\x1b[0m");
         continue;
       }

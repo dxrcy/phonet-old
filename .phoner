@@ -1,6 +1,7 @@
 $V = [iueoa]
 $C = [pbtdkgmnfvszcwjl]
-$X = [<V><C>]
+$x = [<V>aowdi<C>]
+$Xx = [<V>aowdi<C>]
 
 @ Contains invalid letters
 + ^ <X>+ $
@@ -13,12 +14,16 @@ $N = [mn]
 
 * + pono
 * + stono
-* + slono ; * + sonto
-* + ato
+* + slono ; awodi;  * j * + sonto ; **
+ * + ato
+a * + ato
+ ; * + ato
+ ;* + ato
+ ;a* + ato
 
 @ Any repeated letter
 # Backreference
-! (.)\1{1,}
+;! (.)\1{1,}
 
 * + tanta
 * ! atta

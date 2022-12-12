@@ -15,11 +15,11 @@ type Classes = HashMap<String, String>;
 
 /// Type of test
 ///
-/// Can be test, or message
+/// Can be test, or note
 /// ? Move intent to this enum ?
 #[derive(Debug)]
 pub enum TestType {
-  Message(String),
+  Note(String),
   Test(bool, String),
 }
 
@@ -87,7 +87,7 @@ impl Scheme {
           // Comment
           '#' => continue,
 
-          // Classes
+          // Class
           '$' => {
             let mut split = chars.as_str().split("=");
 
@@ -103,13 +103,7 @@ impl Scheme {
             classes.insert(name.to_string(), value.to_string());
           }
 
-          // Define message
-          '@' => {
-            reasons.push(chars.as_str().trim().to_string());
-            reason_ref = Some(reasons.len() - 1);
-          }
-
-          // Rules
+          // Rule
           '+' | '!' => {
             // `+` for true, `!` for false
             let intent = first != '!';
@@ -118,7 +112,7 @@ impl Scheme {
             rules.push((intent, chars.as_str().replace(" ", ""), reason_ref));
           }
 
-          // Tests
+          // Test
           '*' => {
             // Remove spaces
             while chars.as_str().starts_with(' ') {
@@ -147,12 +141,18 @@ impl Scheme {
               tests.push(TestType::Test(intent, word))
             }
           }
+          
+          // Reason
+          '@' => {
+            reasons.push(chars.as_str().trim().to_string());
+            reason_ref = Some(reasons.len() - 1);
+          }
 
-          // Message
+          // Note
           '%' => {
             let msg = chars.as_str().trim().to_string();
             if !msg.is_empty() {
-              tests.push(TestType::Message(msg));
+              tests.push(TestType::Note(msg));
             }
             continue;
           }
