@@ -84,74 +84,7 @@ Like [_rules_](#rules), tests must have a defined _intent_, either `+` for _posi
 
 ## Example
 
-Below is an example of a `phoner` file.
-
-//TODO Update to new syntax!
-
-```phoner
-$V [iueoa]
-$C [pbtdkgmnfvszcwjl]
-
-@ Contains invalid letters
-&+ ^ [VC]+ $
-
-$S [sc]
-$N [mn]
-
-@ Basic structure
-&+ ^ S? (C? V K?)+   $
-
-*+ pono
-*+ stono
-*+ slono
-*+ sonto
-*+ ato
-
-@ Any repeated letter
-# Backreference
-&! (.)\1{1,}
-
-*+ tanta
-*! atta
-*! taata
-
-@ More than 2 seq. consonants
-&! C{3}
-
-*+ apa
-*! aspla
-*! assa
-*! asssa
-
-@ Sibilant before anything other than [ptkmnl]
-&! S[bdgfvszcwj]
-
-*+ spono
-*+ stono
-*! sbono
-*+ skono
-*+ smono
-*+ snono
-*+ cnono
-*+ cpono
-*! cgono
-
-@@ j|w beside i|u respectively
-&! ji
-&! ij
-&! wu
-&! uw
-
-*! aji
-*+ aju
-*! awu
-
-# Some more tests
-
-*+ telo
-*+ tenlo
-*! telno
-```
+See the [examples](./examples/) folder for `phoner` file examples.
 
 # TODO
 
