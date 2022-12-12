@@ -41,18 +41,20 @@ Options:
 A `.phoner` file is used to define the rules, classes, and tests for the program.
 
 The syntax is command based.
-A line can start with one of the following line operators:
 
-- `#` Hashtag: A whole line comment
+//TODO Add line operators reference!
+
+<!-- A line can start with one of the following line operators: -->
+
+<!-- - `#` Hashtag: A whole line comment
 - `$` Dollar: Define a [_class_](#classes)
 - `@` Commat: Describe a subsequent rule. This is used as the _reason_ if a test fails
-- - `@@` Double Commat: A _useful_ reason, that is used by every following rule before the next reason
 - `&` Ampersand: Define a [_rule_](#rule). Use `+` or `!` to identify _intent_
 - - `&+` Ampersand Plus: Defines a _positive rule_ (Rule must be followed for word to be valid)
 - - `&!` Ampersand Bang: Defines a _negative rule_ (Rule must **not** be followed for word to be valid)
 - `*` Star: Creates a [_test_](#tests). Use `+` or `!` to identify _intent_
 - - `*+` Star Plus: Creates a _passing test_ (Word must be valid to pass)
-- - `*!` Star Bang: Creates a _failing test_ (Word must **not** be valid to pass)
+- - `*!` Star Bang: Creates a _failing test_ (Word must **not** be valid to pass) -->
 
 ## Classes
 
@@ -83,6 +85,8 @@ Like [_rules_](#rules), tests must have a defined _intent_, either `+` for _posi
 ## Example
 
 Below is an example of a `.phoner` file.
+
+//TODO Update to new syntax!
 
 ```phoner
 $V [iueoa]
@@ -154,23 +158,3 @@ $N [mn]
 - Fix error handling
 - Add docs !
 - Add tests !
-
-## Experimental syntax
-
-```
-$ Cx = ptk
-
-@ reason
-+ ( <Cx> a )+
-! <Cx> {2}
-
-# split at space
-# split at semicolon
-
-@* message
-*+ pata
-*+ pa ta
-
-@* other message
-*! xe ; *! xee
-```

@@ -1,62 +1,63 @@
-$V [iueoa]
-$C [pbtdkgmnfvszcwjl]
+$V = [iueoa]
+$C = [pbtdkgmnfvszcwjl]
+$X = [<V><C>]
 
 @ Contains invalid letters
-&+ ^ [VC]+ $
++ ^ <X>+ $
 
-$S [sc]
-$N [mn]
+$S = [sc]
+$N = [mn]
 
 @ Basic structure
-&+ ^ S? (C? V N?)+   $
++ ^ <S>? (<C>? <V> <N>?)+   $
 
-*+ pono
-*+ stono
-*+ slono
-*+ sonto
-*+ ato
+* + pono
+* + stono
+* + slono ; * + sonto
+* + ato
 
 @ Any repeated letter
 # Backreference
-&! (.)\1{1,}
+! (.)\1{1,}
 
-*+ tanta
-*! atta
-*! taata
+* + tanta
+* ! atta
+* ! taata
 
 @ More than 2 seq. consonants
-&! C{3}
+! <C> {3}
 
-*+ apa
-*! aspla
-*! assa
-*! asssa
+* + apa
+* ! aspla
+* ! assa
+* ! asssa
 
 @ Sibilant before anything other than [ptkmnl]
-&! S[bdgfvszcwj]
+! <S> [bdgfvszcwj]
 
-*+ spono
-*+ stono
-*! sbono
-*+ skono
-*+ smono
-*+ snono
-*+ cnono
-*+ cpono
-*! cgono
+* + spono
+* + stono
+% Some message
+* ! sbono
+* + skono
+* + smono
+* + snono
+% Some other message
+* + cnono
+* + cpono
+* ! cgono
 
-@@ j|w beside i|u respectively
-&! ji
-&! ij
-&! wu
-&! uw
+@ j|w beside i|u respectively
+! ji
+! ij
+! wu ; ! uw
 
-*! aji
-*+ aju
-*! awu
+* ! aji
+* + aju
+* ! awu
 
-# Some more tests
+@ Some more tests
 
-*+ telo
-*+ tenlo
-*! telno
+* + telo
+* + tenlo
+* ! telno

@@ -1,5 +1,5 @@
-use super::{
-  Rules, Scheme,
+use crate::{
+  scheme::{Rules, Scheme, TestType},
   Validity::{self, *},
 };
 
@@ -16,11 +16,30 @@ pub fn run_tests(scheme: Scheme) {
   );
 
   // Get max length of all words
-  let max_word_len = scheme.tests.iter().map(|x| x.1.len()).max().unwrap_or(0);
+  let max_word_len = scheme
+    .tests
+    .iter()
+    .map(|test| {
+      if let TestType::Test(_, word) = test {
+        word.len()
+      } else {
+        0
+      }
+    })
+    .max()
+    .unwrap_or(0);
 
   // Test each word, tally fails
   let mut fails = 0;
-  for (intent, word) in scheme.tests {
+  for test in scheme.tests {
+    let (intent, word) = match test {
+      TestType::Message(msg) => {
+        println!("\x1b[34m{msg}\x1b[0m");
+        continue;
+      }
+      TestType::Test(intent, word) => (intent, word),
+    };
+
     // Validate word against rules, get reason for invalid
     let reason = validate_test(&word, &scheme.rules);
 
@@ -28,20 +47,21 @@ pub fn run_tests(scheme: Scheme) {
     let passed = !(reason.is_valid() ^ intent);
 
     // Define reason for test fail
-    let fail_reason = if !passed {
+    let reason = if !passed {
       reason.unwrap_or(
-        "\x1b[33mMatched, but should have not\x1b[0m".to_string(),
-        "No reason given".to_string(),
+        "\x1b[33mMatched, but should have not\x1b[0m",
+        "No reason given",
+        &scheme.reasons,
       )
     } else {
-      String::new()
+      ""
     };
 
     // Output single result
     println!(
-      "  \x1b[{intent}\x1b[0m {word}{space}  \x1b[1;{result} \x1b[0;3;1m{fail_reason}\x1b[0m",
-      result = if passed { "32mpass" } else { "31mFAIL" },
+      "  \x1b[{intent}\x1b[0m {word}{space}  \x1b[1;{result} \x1b[0;3;1m{reason}\x1b[0m",
       intent = if intent { "36m✔" } else { "35m✗" },
+      result = if passed { "32mpass" } else { "31mFAIL" },
       space = " ".repeat(max_word_len - word.len()),
     );
 
@@ -65,15 +85,16 @@ pub fn run_tests(scheme: Scheme) {
 /// Check if string is valid with rules
 fn validate_test(word: &str, rules: &Rules) -> Validity {
   // Check for match with every rule, if not, return reason
-  for (should_match, rule, reason) in rules {
+  for (should_match, rule, reason_ref) in rules {
     // Check if rule matches, and whether match signifies returning invalid or continuing
     if should_match
       ^ rule
         .is_match(word)
         // ? Why is this a result ?
+        //TODO Fix this
         .expect("Failed checking match. This error should have been fixed :(")
     {
-      return Invalid(reason.clone());
+      return Invalid(*reason_ref);
     }
   }
 

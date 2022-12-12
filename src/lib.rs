@@ -1,26 +1,19 @@
-use fancy_regex::Regex;
-
 mod args;
 mod scheme;
 mod tests;
 
 pub use args::Args;
-pub use scheme::{Scheme, ParseError};
+pub use scheme::{ParseError, Scheme, TestType};
 pub use tests::run_tests;
 
 use Validity::*;
-
-/// Alias for vector of rules (intent, expression, and invalidity reason)
-type Rules = Vec<(bool, Regex, Option<String>)>;
-/// Alias for vector of tests (intent and value)
-type Tests = Vec<(bool, String)>;
 
 /// State of rules match of word
 ///
 /// If invalid, reason can be provided
 enum Validity {
   Valid,
-  Invalid(Option<String>),
+  Invalid(Option<usize>),
 }
 
 impl Validity {
@@ -33,10 +26,20 @@ impl Validity {
   }
 
   /// Unwrap reason with default
-  pub fn unwrap_or(self, if_valid: String, if_none: String) -> String {
-    if let Invalid(reason) = self {
-      return match reason {
-        Some(reason) => reason,
+  ///
+  /// Replaces reference to reason with value
+  pub fn unwrap_or<'a>(
+    self,
+    if_valid: &'a str,
+    if_none: &'a str,
+    reasons: &'a Vec<String>,
+  ) -> &'a str {
+    if let Invalid(reason_ref) = self {
+      return match reason_ref {
+        Some(reason) => match reasons.get(reason) {
+          Some(x) => x,
+          None => if_none,
+        },
         None => if_none,
       };
     }

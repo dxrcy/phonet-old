@@ -2,14 +2,34 @@ use std::{collections::HashMap, fmt::Display};
 
 use fancy_regex::Regex;
 
-use super::{Rules, Tests};
 use ParseError::*;
+
+/// Alias for vector of rules (intent, expression, and invalidity reason)
+pub type Rules = Vec<(bool, Regex, Option<usize>)>;
+
+/// Alias for vector of tests (intent and value)
+type Tests = Vec<TestType>;
+
+/// Alias for hashmap of class name and value
+type Classes = HashMap<String, String>;
+
+/// Type of test
+///
+/// Can be test, or message
+/// ? Move intent to this enum ?
+#[derive(Debug)]
+pub enum TestType {
+  Message(String),
+  Test(bool, String),
+}
 
 /// Error enum for `Scheme`
 pub enum ParseError {
   UnknownIntentIdentifier(char),
   UnknownLineOperator(char),
   UnknownClass(char),
+  NoClassName,
+  NoClassValue,
   RegexFail(fancy_regex::Error),
 }
 
@@ -22,13 +42,12 @@ impl Display for ParseError {
       ),
       UnknownLineOperator(ch) => write!(f, "Unknown line operator `{ch}`"),
       UnknownClass(name) => write!(f, "Unknown class `{name}`"),
+      NoClassName => write!(f, "No class name given"),
+      NoClassValue => write!(f, "No class value given"),
       RegexFail(err) => write!(f, "Failed to parse Regex: {err}"),
     }
   }
 }
-
-/// Alias for hashmap of class name and value
-type Classes = HashMap<char, String>;
 
 #[derive(Debug)]
 /// Scheme parsed from file
@@ -37,6 +56,7 @@ type Classes = HashMap<char, String>;
 pub struct Scheme {
   pub rules: Rules,
   pub tests: Tests,
+  pub reasons: Vec<String>,
 }
 
 //TODO Rename this
@@ -46,11 +66,13 @@ impl Scheme {
     // Builders
     let mut classes = Classes::new();
     let mut tests = Tests::new();
-    let mut rules_raw = Vec::new();
-    let mut rule_reason: Option<String> = None;
-    let mut is_useful_reason = false;
+    let mut rules = Vec::new();
 
-    for line in file.lines() {
+    let mut reasons = Vec::new();
+    let mut reason_ref: Option<usize> = None;
+
+    // Split at semicolon or line
+    for line in file.replace(";", "\n").lines() {
       let line = line.trim();
 
       // Continue for blank
@@ -67,63 +89,42 @@ impl Scheme {
 
           // Classes
           '$' => {
-            if let Some(name) = chars.next() {
-              let value = chars.as_str().trim();
-              classes.insert(name, value.to_string());
-            }
+            let mut split = chars.as_str().split("=");
+
+            let name = match split.next() {
+              Some(x) => x.trim(),
+              None => return Err(ParseError::NoClassName),
+            };
+            let value = match split.next() {
+              Some(x) => x.trim(),
+              None => return Err(ParseError::NoClassValue),
+            };
+
+            classes.insert(name.to_string(), value.to_string());
           }
 
-          // Define rule reason
+          // Define message
           '@' => {
-            // Use '@@' for reason used by multiple rules
-            if Some('@') == chars.next() {
-              chars.next();
-              is_useful_reason = true;
-            } else {
-              is_useful_reason = false;
-            }
-
-            // Set reason
-            rule_reason = Some(chars.as_str().trim().to_string());
-            continue;
+            reasons.push(chars.as_str().trim().to_string());
+            reason_ref = Some(reasons.len() - 1);
           }
 
           // Rules
-          '&' => {
-            // Check intent
+          '+' | '!' => {
             // `+` for true, `!` for false
-            let intent = match chars.next() {
-              // Should be INVALID to pass
-              Some('+') => true,
-              // Should be VALID to pass
-              Some('!') => false,
-
-              // Unknown character
-              Some(ch) => {
-                return Err(UnknownIntentIdentifier(ch));
-                // return Err(format!(
-                //   "Unknown intent identifier `{ch}`. Must be either `+` or `!`"
-                // ))
-              }
-              // No character
-              None => continue,
-            };
+            let intent = first != '!';
 
             // Add rule
-            rules_raw.push((
-              intent,
-              chars.as_str().replace(" ", ""),
-              rule_reason.clone(),
-            ));
-
-            // Use '@@' for reason used by multiple rules
-            if !is_useful_reason {
-              rule_reason = None;
-            }
+            rules.push((intent, chars.as_str().replace(" ", ""), reason_ref));
           }
 
           // Tests
           '*' => {
+            // Remove spaces
+            while chars.as_str().starts_with(' ') {
+              chars.next();
+            }
+
             // Check intent
             // `+` for true, `!` for false
             let intent = match chars.next() {
@@ -135,9 +136,6 @@ impl Scheme {
               // Unknown character
               Some(ch) => {
                 return Err(UnknownIntentIdentifier(ch));
-                // return Err(format!(
-                //   "Unknown intent identifier `{ch}`. Must be either `+` or `!`"
-                // ))
               }
               // No character
               None => continue,
@@ -146,48 +144,63 @@ impl Scheme {
             // Add test
             let word = chars.as_str().trim().to_string();
             if !word.is_empty() {
-              tests.push((intent, word))
+              tests.push(TestType::Test(intent, word))
             }
+          }
+
+          // Message
+          '%' => {
+            let msg = chars.as_str().trim().to_string();
+            if !msg.is_empty() {
+              tests.push(TestType::Message(msg));
+            }
+            continue;
           }
 
           // Unknown
           _ => return Err(UnknownLineOperator(first)),
-          // _ => return Err(format!("Unknown line operator `{first}`")),
         }
       }
     }
 
-    // Substitute classes in rule
-    let mut rules = Rules::new();
-    for (intent, rule, reason) in rules_raw {
-      let re = match Regex::new(&substitute_classes(&rule, &classes)?) {
-        Ok(x) => x,
-        Err(err) => return Err(RegexFail(err)),
-      };
-
-      rules.push((intent, re, reason));
-    }
-
-    Ok(Scheme { rules, tests })
+    Ok(Scheme {
+      rules: make_regex(rules, &classes)?,
+      tests,
+      reasons,
+    })
   }
 }
 
-/// Substitute class names regex rule with class values
-fn substitute_classes(rule: &str, classes: &Classes) -> Result<String, ParseError> {
-  let mut new = rule.to_string();
-  for ch in rule.chars() {
-    // Replace class with value if exists
-    if ch.is_uppercase() {
-      // Return error if class does not exist
-      let value = match classes.get(&ch) {
-        Some(x) => x,
-        None => return Err(UnknownClass(ch)),
-        // None => return Err(format!("Unknown class `{ch}`")),
-      };
+/// Substitute classes in rule and create regex
+fn make_regex(
+  raw_rules: Vec<(bool, String, Option<usize>)>,
+  classes: &Classes,
+) -> Result<Rules, ParseError> {
+  let mut rules = Rules::new();
 
-      // Replace name with value (surrounded in round brackets to separate from rest of rule)
-      new = new.replace(ch, &format!("({})", value));
+  for (intent, rule, reason) in raw_rules {
+    let re = match Regex::new(&substitute_classes(rule, classes)?) {
+      Ok(x) => x,
+      Err(err) => return Err(RegexFail(err)),
+    };
+
+    rules.push((intent, re, reason));
+  }
+
+  Ok(rules)
+}
+
+/// Substitute class names regex rule with class values
+// TODO Optimize this! Sub all classes first, then sub rules
+fn substitute_classes(rule: String, classes: &Classes) -> Result<String, ParseError> {
+  let mut rule = rule;
+
+  for (name, value) in classes {
+    let ident = format!("<{}>", name);
+    if rule.contains(&ident) {
+      rule = rule.replace(&ident, &substitute_classes(value.to_string(), &classes)?);
     }
   }
-  Ok(new)
+
+  Ok(rule)
 }

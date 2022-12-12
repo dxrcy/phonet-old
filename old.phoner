@@ -1,0 +1,62 @@
+$V [iueoa]
+$C [pbtdkgmnfvszcwjl]
+
+@ Contains invalid letters
+&+ ^ [VC]+ $
+
+$S [sc]
+$N [mn]
+
+@ Basic structure
+&+ ^ S? (C? V N?)+   $
+
+*+ pono
+*+ stono
+*+ slono
+*+ sonto
+*+ ato
+
+@ Any repeated letter
+# Backreference
+&! (.)\1{1,}
+
+*+ tanta
+*! atta
+*! taata
+
+@ More than 2 seq. consonants
+&! C{3}
+
+*+ apa
+*! aspla
+*! assa
+*! asssa
+
+@ Sibilant before anything other than [ptkmnl]
+&! S[bdgfvszcwj]
+
+*+ spono
+*+ stono
+*! sbono
+*+ skono
+*+ smono
+*+ snono
+*+ cnono
+*+ cpono
+*! cgono
+
+@@ j|w beside i|u respectively
+&! ji
+&! ij
+&! wu
+&! uw
+
+*! aji
+*+ aju
+*! awu
+
+# Some more tests
+
+*+ telo
+*+ tenlo
+*! telno
