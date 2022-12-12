@@ -135,10 +135,14 @@ impl Scheme {
               None => continue,
             };
 
-            // Add test
-            let word = chars.as_str().trim().to_string();
-            if !word.is_empty() {
-              tests.push(TestType::Test(intent, word))
+            // Split at space
+            let words = chars.as_str().split_whitespace();
+            for word in words {
+              // Add test
+              let word = word.trim().to_string();
+              if !word.is_empty() {
+                tests.push(TestType::Test(intent, word));
+              }
             }
           }
 

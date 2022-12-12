@@ -11,14 +11,12 @@ $N = [mn]
 @ Basic structure
 + ^ <S>? (<C>? <V> <N>?)+ $
 
-     # aodiwj;?!aowijd
-
-? + pono
+?+ pono
 ? + stono
-? + slono ; ? + sonto
-? + ato
+? +slono ; ? + sonto
+?+ ato
 
-@ Any repeated letter
+ @ Any repeated letter
 # Backreference
 ;! (.)\1{1,}
 
@@ -30,9 +28,7 @@ $N = [mn]
 ! <C> {3}
 
 ? + apa
-? ! aspla
-? ! assa
-? ! asssa
+? ! aspla assa asssa
 
 @ Sibilant before anything other than [ptkmnl]
 ! <S> [bdgfvszcwj]
@@ -41,9 +37,7 @@ $N = [mn]
 ? + stono
 * Some note
 ? ! sbono
-? + skono
-? + smono
-? + snono
+? + skono smono snono3
 * Some other note
 ? + cnono
 ? + cpono
