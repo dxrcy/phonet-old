@@ -113,7 +113,7 @@ impl Scheme {
           }
 
           // Test
-          '*' => {
+          '?' => {
             // Remove spaces
             while chars.as_str().starts_with(' ') {
               chars.next();
@@ -149,7 +149,7 @@ impl Scheme {
           }
 
           // Note
-          '%' => {
+          '*' => {
             let msg = chars.as_str().trim().to_string();
             if !msg.is_empty() {
               tests.push(TestType::Note(msg));
@@ -192,6 +192,7 @@ fn make_regex(
 
 /// Substitute class names regex rule with class values
 // TODO Optimize this! Sub all classes first, then sub rules
+// TODO Change to not using blind replace - check for /<.>/ then check if class exists
 fn substitute_classes(rule: String, classes: &Classes) -> Result<String, ParseError> {
   let mut rule = rule;
 
