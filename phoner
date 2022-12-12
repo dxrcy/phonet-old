@@ -16,6 +16,14 @@ $N = [mn]
 ? +slono ; ? + sonto
 ?+ ato
 
+  # aowidj
+
+# aowidj
+# aowidj;
+# aowidj
+  # aowidj;
+	# aowidj
+
  @ Any repeated letter
 # Backreference
 ;! (.)\1{1,}
