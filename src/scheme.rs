@@ -141,9 +141,21 @@ impl Scheme {
               tests.push(TestType::Test(intent, word))
             }
           }
-          
+
           // Reason
           '@' => {
+            // Remove spaces
+            while chars.as_str().starts_with(' ') {
+              chars.next();
+            }
+
+            // Reason note
+            if chars.as_str().starts_with('*') {
+              chars.next();
+              tests.push(TestType::Note(chars.as_str().trim().to_string()));
+            }
+
+            // Add reason
             reasons.push(chars.as_str().trim().to_string());
             reason_ref = Some(reasons.len() - 1);
           }

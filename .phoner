@@ -9,7 +9,9 @@ $S = [sc]
 $N = [mn]
 
 @ Basic structure
-+ ^ <S>? (<C>? <V> <N>?)+   $
++ ^ <S>? (<C>? <V> <N>?)+ $
+
+     # aodiwj;?!aowijd
 
 ? + pono
 ? + stono
@@ -47,7 +49,7 @@ $N = [mn]
 ? + cpono
 ? ! cgono
 
-@ j|w beside i|u respectively
+@* j|w beside i|u respectively
 ! ji
 ! ij
 ! wu ; ! uw
