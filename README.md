@@ -31,9 +31,10 @@ Arguments:
   [TESTS]  Custom test, separate with comma (Ignores tests in file)
 
 Options:
-  -f, --file <FILE>  Path of file to parse and test [default: phoner]
-  -h, --help         Print help information
-  -V, --version      Print version information
+  -f, --file <FILE>                    Path of file to parse and test [default: phoner]
+  -d, --display-level <DISPLAY_LEVEL>  Don't display passing tests to output [default: show-all] [possible values: show-all, notes-and-fails, just-fails, hide-all]
+  -h, --help                           Print help information (use `--help` for more detail)
+  -V, --version                        Print version information
 ```
 
 # File syntax
@@ -111,6 +112,8 @@ Example (with predefined [_classes_](#classes)):
 
 Tests are checked against all rules, and the result is displayed in the output.
 
+Tests are ran in the order of definition.
+
 Like [_rules_](#rules), tests must have a defined _intent_, either `+` for _positive_, or `!` for _negative_.
 
 - A _positive_ test will pass if it is valid
@@ -136,8 +139,6 @@ Example (with predefined [_rules_](#rules)):
 ## Reasons
 
 Reasons are used before [_rules_](#rules) as an explanation if a test fails.
-
-Tests are ran in the order of definition.
 
 Syntax:
 
