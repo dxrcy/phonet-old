@@ -19,7 +19,7 @@ fn main() -> Result<(), String> {
       .collect();
   }
 
-  run_tests(scheme);
+  run_tests(scheme, args.display_level);
 
   Ok(())
 }

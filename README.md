@@ -188,7 +188,7 @@ See the [examples](./examples/) folder for `phoner` file examples.
 
 # TODO
 
-- Add option for invisible testing
+- Separate test runner and test printer
 - Fix error handling
 - Add docs !
 - Add tests !
