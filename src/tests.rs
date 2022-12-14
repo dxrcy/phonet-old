@@ -32,9 +32,18 @@ pub fn run_tests(scheme: Scheme, display_level: DisplayLevel) {
   let mut is_first_print = true;
   for test in scheme.tests {
     let (intent, word) = match test {
-      TestType::Note(msg) => {
+      TestType::Note(note) => {
         match display_level {
-          ShowAll | NotesAndFails => println!("\x1b[34m{msg}\x1b[0m"),
+          ShowAll | NotesAndFails => {
+            // Blank line if is first print
+            if is_first_print {
+              println!();
+            }
+
+            // Print note
+            println!("\x1b[34m{note}\x1b[0m");
+            is_first_print = false;
+          }
           _ => (),
         }
         continue;
