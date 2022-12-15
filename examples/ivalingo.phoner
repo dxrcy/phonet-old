@@ -1,0 +1,87 @@
+# Pure vowels
+$V = [iueoa]
+# All consonants
+$C = [pbtdkgmnfvszcwjl]
+# Sibilants
+$S = [sc]
+# Approximants;
+$A = [jw]
+# Coda consonants
+$K = [mnlwjsc]
+
+@* Contains unknown letters
+  + ^ [<V><C>]+ $
+    ?+ ivalingo
+    ?! ixarinqo
+
+@* Basic structure
+  + ^ <S>? (<C>? l? <V> <A>? <K>? )+ $
+    ?+ plono stono slono sonto sojto ato ajto telojn
+
+@* 1. Any repeated letter
+  # Backreference
+  ! (.)\1{1,}
+    ?+ tanta
+    ?! atta taata
+
+@* 2. More than 3 seq. consonants
+  ! <C>{4}
+    ?+ aspa aspla
+    ?! anspla assa asssa
+
+@* 2. More than 2 seq. vowels
+  ! <V>{3}
+    ?+ tiano
+    ?! tiaono
+
+@* 3. Sibilant before invalid consonant
+  ! <S> [bdgfvszcwj]
+    ?+ spono stono skono smono snono cnono cmono cpono
+    ?! sbono cgono
+
+@* 4. [jw] beside [iu] respectively
+  ! ji
+  ! ij
+  ! wu
+  ! uw
+    ?+ tuj aju
+    ?! aji awu
+
+@* 5. Invalid seq. vowels
+  ! iu
+  ! u[eoi]
+  ! [aeo] <V>
+    ?+ ie io ia
+    ?! ii iu
+    ?+ ua
+    ?! ui uu ue uo
+    ?! ei au oe
+
+@* 6. Approximant before [l]
+  ! <A> l
+    ?+ ajn ajno ajto awto
+    ?! ajlo awlo
+
+@* 7. Sequential approximants
+  ! <A>{2}
+    ?! ajjo awjo ajwo
+
+@* 8. Sequential nasals
+  ! [mn]{2}
+    ?+ anta
+    ?! amna anma amma
+
+@* 9. [n] before invalid consonant
+  ! n[pb]
+    ?+ ampa
+    ?! anpa anba
+
+@* 10. [m] before invalid consonant
+  ! m[tdszfv]
+    ?+ anta
+    ?! amta amfa
+
+@* 11. [nml] before approximant
+  ! [nml] <A>
+    ?+ anta awa
+    ?! anwa anja amja
