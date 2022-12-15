@@ -17,6 +17,10 @@ This project can be used as a rust library, or as a binary.
 
 //TODO Add more explanation
 
+<!-- add to $env:path -->
+
+<!-- argument explanation -->
+
 Argument syntax:
 
 ```
@@ -39,7 +43,20 @@ Add `phoner = {git = "https://github.com/darccyy/phoner.git"}` to your `Crates.t
 
 **Crates.io** and **Docs.rs** coming soon...
 
-//TODO Add example
+```rs
+use phoner::{DisplayLevel, Phoner, PhonerResults};
+use std::fs;
+
+fn main() {
+  let file = fs::read_to_string("phoner").unwrap();
+
+  // Parse file
+  let scheme = Phoner::parse(&file).expect("Failed to parse");
+
+  // Run tests and display
+  PhonerResults::run(scheme).display(DisplayLevel::ShowAll);
+}
+```
 
 # File syntax
 

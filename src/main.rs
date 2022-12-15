@@ -26,11 +26,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
       .collect();
   }
 
-  // Run tests
-  let results = PhonerResults::run(scheme);
-
-  // Display tests
-  results.display(args.display_level);
+  // Run tests and display
+  PhonerResults::run(scheme).display(args.display_level);
 
   Ok(())
 }
