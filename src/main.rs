@@ -1,7 +1,7 @@
 use std::fs;
 
 use clap::Parser;
-use phoner::{Args, Scheme, TestResults, TestType};
+use phoner::{Args, Phoner, TestResults, TestType};
 
 fn main() -> Result<(), String> {
   let args = Args::parse();
@@ -12,13 +12,16 @@ fn main() -> Result<(), String> {
     .map_err(|err| format!("Could not read file '{}' - {:?}", args.file, err))?;
 
   // Parse file
-  let mut scheme = Scheme::parse(&file).map_err(|x| format!("Could not parse file: {x}"))?;
+  let mut scheme = Phoner::parse(&file).map_err(|x| format!("Could not parse file: {x}"))?;
 
   // Use CLI tests if given
   if let Some(tests) = args.tests {
     scheme.tests = tests
       .split(',')
-      .map(|x| TestType::Test(true, x.to_string()))
+      .map(|x| TestType::Test {
+        intent: true,
+        word: x.to_string(),
+      })
       .collect();
   }
 

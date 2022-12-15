@@ -1,8 +1,9 @@
 use crate::{
   args::DisplayLevel::{self, *},
-  scheme::{Rules, Scheme, TestType},
+  scheme::Phoner,
+  Reason::{self, *},
+  ResultType, Rules, TestType,
 };
-use Reason::*;
 use Validity::*;
 
 /// Results from `run_tests` function
@@ -27,7 +28,7 @@ impl TestResults {
   }
 
   /// Run tests, return results
-  pub fn run(scheme: Scheme) -> TestResults {
+  pub fn run(scheme: Phoner) -> TestResults {
     // No tests
     if scheme.tests.len() < 1 {
       return TestResults::empty();
@@ -45,7 +46,7 @@ impl TestResults {
         TestType::Note(note) => list.push(ResultType::Note(note)),
 
         // Test - Validate test, check validity with intent, create reason for failure
-        TestType::Test(intent, word) => {
+        TestType::Test { intent, word } => {
           // Validate test
           let reason = validate_test(&word, &scheme.rules);
 
@@ -205,54 +206,6 @@ impl TestResults {
   }
 }
 
-/// Result of one test, or note
-pub enum ResultType {
-  /// Display line of text
-  Note(String),
-  /// Result of test
-  Test {
-    /// Intent of test passing
-    intent: bool,
-    /// Word tested
-    word: String,
-    /// Whether test passed or not
-    pass: bool,
-    /// Reason for fail
-    reason: Reason,
-  },
-}
-
-/// Reason for failure variants
-pub enum Reason {
-  /// Test passed, do not display reason
-  Passed,
-  /// No reason was given for rule for test failing
-  NoReasonGiven,
-  /// Test matched, but should have not
-  ShouldNotHaveMatched,
-  /// Custom reason for rule
-  Custom(String),
-}
-
-/// Check if string is valid with rules
-fn validate_test(word: &str, rules: &Rules) -> Validity {
-  // Check for match with every rule, if not, return reason
-  for (should_match, rule, reason_ref) in rules {
-    // Check if rule matches, and whether match signifies returning invalid or continuing
-    if should_match
-      ^ rule
-        .is_match(word)
-        // ? Why is this a result ?
-        //TODO Fix this
-        .expect("Failed checking match. This error should have been fixed :(")
-    {
-      return Invalid(*reason_ref);
-    }
-  }
-
-  Valid
-}
-
 /// State of rules match of word
 ///
 /// If invalid, reason can be provided
@@ -290,4 +243,23 @@ impl Validity {
     }
     if_valid
   }
+}
+
+/// Check if string is valid with rules
+fn validate_test(word: &str, rules: &Rules) -> Validity {
+  // Check for match with every rule, if not, return reason
+  for (should_match, rule, reason_ref) in rules {
+    // Check if rule matches, and whether match signifies returning invalid or continuing
+    if should_match
+      ^ rule
+        .is_match(word)
+        // ? Why is this a result ?
+        //TODO Fix this
+        .expect("Failed checking match. This error should have been fixed :(")
+    {
+      return Invalid(*reason_ref);
+    }
+  }
+
+  Valid
 }

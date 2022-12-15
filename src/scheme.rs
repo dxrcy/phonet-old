@@ -1,29 +1,10 @@
-use std::{collections::HashMap, fmt::Display};
+use std::fmt::Display;
 
 use fancy_regex::Regex;
 
+use crate::{Classes, Rules, TestType, Tests};
+
 use ParseError::*;
-
-/// Alias for vector of rules (intent, expression, and invalidity reason)
-pub type Rules = Vec<(bool, Regex, Option<usize>)>;
-
-/// Alias for vector of tests (intent and value)
-type Tests = Vec<TestType>;
-
-/// Alias for hashmap of class name and value
-type Classes = HashMap<String, String>;
-
-/// Type of test
-///
-/// Can be test, or note
-/// ? Move intent to this enum ?
-#[derive(Debug)]
-pub enum TestType {
-  ///
-  Note(String),
-  /// TODO Change to inline struct
-  Test(bool, String),
-}
 
 /// Error enum for `Scheme`
 pub enum ParseError {
@@ -55,16 +36,16 @@ impl Display for ParseError {
 /// Scheme parsed from file
 ///
 /// Holds rules and tests
-pub struct Scheme {
+pub struct Phoner {
   pub rules: Rules,
   pub tests: Tests,
   pub reasons: Vec<String>,
 }
 
 //TODO Rename this
-impl Scheme {
+impl Phoner {
   /// Parse `Scheme` from file
-  pub fn parse(file: &str) -> Result<Scheme, ParseError> {
+  pub fn parse(file: &str) -> Result<Phoner, ParseError> {
     // Builders
     let mut classes = Classes::new();
     let mut tests = Tests::new();
@@ -143,7 +124,7 @@ impl Scheme {
               // Add test
               let word = word.trim().to_string();
               if !word.is_empty() {
-                tests.push(TestType::Test(intent, word));
+                tests.push(TestType::Test { intent, word });
               }
             }
           }
@@ -181,7 +162,7 @@ impl Scheme {
       }
     }
 
-    Ok(Scheme {
+    Ok(Phoner {
       rules: make_regex(rules, &classes)?,
       tests,
       reasons,
