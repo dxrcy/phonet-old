@@ -4,7 +4,7 @@ mod tests;
 
 pub use args::{Args, DisplayLevel};
 pub use scheme::{ParseError, Scheme, TestType};
-pub use tests::{run_tests, display_results};
+pub use tests::{TestResults};
 
 use Validity::*;
 
