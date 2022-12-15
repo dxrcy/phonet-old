@@ -1,7 +1,7 @@
 use std::fs;
 
 use clap::Parser;
-use phoner::{Args, Phoner, TestResults, TestType};
+use phoner::{types::TestDef, Args, Phoner, PhonerResults};
 
 fn main() -> Result<(), String> {
   let args = Args::parse();
@@ -18,7 +18,7 @@ fn main() -> Result<(), String> {
   if let Some(tests) = args.tests {
     scheme.tests = tests
       .split(',')
-      .map(|x| TestType::Test {
+      .map(|x| TestDef::Test {
         intent: true,
         word: x.to_string(),
       })
@@ -26,7 +26,7 @@ fn main() -> Result<(), String> {
   }
 
   // Run tests
-  let results = TestResults::run(scheme);
+  let results = PhonerResults::run(scheme);
 
   // Display tests
   results.display(args.display_level);

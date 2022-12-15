@@ -1,15 +1,15 @@
 use crate::{
   args::DisplayLevel::{self, *},
   scheme::Phoner,
-  Reason::{self, *},
-  ResultType, Rules, TestType,
+  types::{Rules, TestDef, TestResult},
 };
+use Reason::*;
 use Validity::*;
 
 /// Results from `run_tests` function
-pub struct TestResults {
+pub struct PhonerResults {
   /// List of results of each test
-  list: Vec<ResultType>,
+  list: Vec<TestResult>,
   /// Amount of failed tests
   fail_count: u32,
   /// Length of longest word in tests
@@ -17,21 +17,16 @@ pub struct TestResults {
   max_word_len: usize,
 }
 
-impl TestResults {
-  /// Create empty `TestResults`
-  fn empty() -> Self {
-    TestResults {
-      list: Vec::new(),
-      fail_count: 0,
-      max_word_len: 0,
-    }
-  }
-
+impl PhonerResults {
   /// Run tests, return results
-  pub fn run(scheme: Phoner) -> TestResults {
+  pub fn run(scheme: Phoner) -> PhonerResults {
     // No tests
     if scheme.tests.len() < 1 {
-      return TestResults::empty();
+      return PhonerResults {
+        list: Vec::new(),
+        fail_count: 0,
+        max_word_len: 0,
+      };
     }
 
     // Builders
@@ -43,38 +38,20 @@ impl TestResults {
     for test in scheme.tests {
       match test {
         // Note - simply add to list
-        TestType::Note(note) => list.push(ResultType::Note(note)),
+        TestDef::Note(note) => list.push(TestResult::Note(note)),
 
         // Test - Validate test, check validity with intent, create reason for failure
-        TestType::Test { intent, word } => {
+        TestDef::Test { intent, word } => {
           // Validate test
-          let reason = validate_test(&word, &scheme.rules);
+          let validity = validate_test(&word, &scheme.rules);
 
           // Check if validity status with test intent
-          let pass = !(reason.is_valid() ^ intent);
+          let pass = !(validity.is_valid() ^ intent);
 
           // Create reason
           let reason = if !pass {
             // Test failed - Some reason
-            match reason {
-              // Test was valid, but it should have not matched
-              Valid => ShouldNotHaveMatched,
-
-              // Test was invalid, but it should have matched
-              Invalid(reason) => match reason {
-                // No reason was given for rule
-                None => NoReasonGiven,
-
-                // Find rule reason in scheme
-                Some(reason) => match scheme.reasons.get(reason) {
-                  // Rule found - Custom reason
-                  Some(x) => Reason::Custom(x.to_string()),
-                  // No rule found
-                  // ? this should not happen ever ?
-                  None => NoReasonGiven,
-                },
-              },
-            }
+            Reason::from(validity, &scheme.reasons)
           } else {
             // Test passed - No reason for failure needed
             Passed
@@ -91,7 +68,7 @@ impl TestResults {
           }
 
           // Add test result to list
-          list.push(ResultType::Test {
+          list.push(TestResult::Test {
             intent,
             word,
             pass,
@@ -101,7 +78,7 @@ impl TestResults {
       }
     }
 
-    TestResults {
+    PhonerResults {
       list,
       fail_count,
       max_word_len,
@@ -126,7 +103,7 @@ impl TestResults {
     for item in &self.list {
       match item {
         // Display note
-        ResultType::Note(note) => match display_level {
+        TestResult::Note(note) => match display_level {
           // Always show
           ShowAll | NotesAndFails => {
             // Blank line for first print
@@ -143,7 +120,7 @@ impl TestResults {
         },
 
         // Display test
-        ResultType::Test {
+        TestResult::Test {
           intent,
           word,
           pass,
@@ -206,9 +183,47 @@ impl TestResults {
   }
 }
 
+/// Reason for failure variants
+pub enum Reason {
+  /// Test passed, do not display reason
+  Passed,
+  /// No reason was given for rule for test failing
+  NoReasonGiven,
+  /// Test matched, but should have not
+  ShouldNotHaveMatched,
+  /// Custom reason for rule
+  Custom(String),
+}
+
+impl Reason {
+  fn from(validity: Validity, reasons: &Vec<String>) -> Self {
+    match validity {
+      // Test was valid, but it should have not matched
+      Valid => ShouldNotHaveMatched,
+
+      // Test was invalid, but it should have matched
+      Invalid(reason) => match reason {
+        // No reason was given for rule
+        None => NoReasonGiven,
+
+        // Find rule reason in scheme
+        Some(reason) => match reasons.get(reason) {
+          // Rule found - Custom reason
+          Some(x) => Reason::Custom(x.to_string()),
+          // No rule found
+          // ? this should not happen ever ?
+          None => NoReasonGiven,
+        },
+      },
+    }
+  }
+}
+
 /// State of rules match of word
 ///
 /// If invalid, reason can be provided
+/// 
+/// ? Make public ?
 enum Validity {
   Valid,
   Invalid(Option<usize>),

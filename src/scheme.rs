@@ -2,11 +2,11 @@ use std::fmt::Display;
 
 use fancy_regex::Regex;
 
-use crate::{Classes, Rules, TestType, Tests};
+use crate::types::{Classes, Rules, TestDef};
 
 use ParseError::*;
 
-/// Error enum for `Scheme`
+/// Error enum for `Phoner` struct
 pub enum ParseError {
   UnknownIntentIdentifier(char),
   UnknownLineOperator(char),
@@ -38,7 +38,7 @@ impl Display for ParseError {
 /// Holds rules and tests
 pub struct Phoner {
   pub rules: Rules,
-  pub tests: Tests,
+  pub tests: Vec<TestDef>,
   pub reasons: Vec<String>,
 }
 
@@ -48,7 +48,7 @@ impl Phoner {
   pub fn parse(file: &str) -> Result<Phoner, ParseError> {
     // Builders
     let mut classes = Classes::new();
-    let mut tests = Tests::new();
+    let mut tests = Vec::new();
     let mut rules = Vec::new();
 
     let mut reasons = Vec::new();
@@ -124,7 +124,7 @@ impl Phoner {
               // Add test
               let word = word.trim().to_string();
               if !word.is_empty() {
-                tests.push(TestType::Test { intent, word });
+                tests.push(TestDef::Test { intent, word });
               }
             }
           }
@@ -139,7 +139,7 @@ impl Phoner {
             // Reason note
             if chars.as_str().starts_with('*') {
               chars.next();
-              tests.push(TestType::Note(chars.as_str().trim().to_string()));
+              tests.push(TestDef::Note(chars.as_str().trim().to_string()));
             }
 
             // Add reason
@@ -151,7 +151,7 @@ impl Phoner {
           '*' => {
             let msg = chars.as_str().trim().to_string();
             if !msg.is_empty() {
-              tests.push(TestType::Note(msg));
+              tests.push(TestDef::Note(msg));
             }
             continue;
           }
