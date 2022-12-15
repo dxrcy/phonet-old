@@ -279,7 +279,7 @@ impl ValidStatus {
 }
 
 /// Check if string is valid with rules
-/// 
+///
 /// ? Make public ?
 fn validate_test(word: &str, rules: &Rules) -> ValidStatus {
   // Check for match with every rule, if not, return reason
@@ -288,9 +288,7 @@ fn validate_test(word: &str, rules: &Rules) -> ValidStatus {
     if should_match
       ^ rule
         .is_match(word)
-        // ? Why is this a result ?
-        //TODO Fix this
-        .expect("Failed checking match. This error should have been fixed :(")
+        .expect("Failed checking regex match. This error should NEVER APPEAR!")
     {
       return Invalid(*reason_ref);
     }

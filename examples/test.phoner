@@ -1,6 +1,7 @@
 $V = [iueoa]
 $C = [pbtdkgmnfvszcwjl]
-$X = [<V><C>]
+# any character
+$_ = [<V><C>]
 
 * note here
 
@@ -10,7 +11,7 @@ $X = [<V><C>]
     ?! ata
 
 @ Contains invalid letters
-  + ^ <X>+ $
+  + ^ <_>+ $
     ?+ aoi123
 
 $S = [sc]

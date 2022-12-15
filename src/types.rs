@@ -18,6 +18,11 @@ pub enum ParseError {
   #[snafu(display("No class name given, on line {line}"))]
   NoClassName { line: usize },
 
+  #[snafu(display(
+    "Invalid class name `{name}`, on {line}. Must only contain characters from [a-zA-Z0-9_]"
+  ))]
+  InvalidClassName { name: String, line: usize },
+
   #[snafu(display("No class value given, on line {line}"))]
   NoClassValue { line: usize },
 

@@ -27,6 +27,8 @@ impl Phoner {
     let mut reasons = Vec::new();
     let mut reason_ref: Option<usize> = None;
 
+    let class_name_pattern = Regex::new(r"^\w+$").expect("Could not parse static regex");
+
     // Split at semicolon or line
     for (line_num, line) in file.replace(";", "\n").lines().enumerate() {
       let line = line.trim();
@@ -47,15 +49,30 @@ impl Phoner {
           '$' => {
             let mut split = chars.as_str().split("=");
 
+            // Get name
             let name = match split.next() {
               Some(x) => x.trim(),
               None => return Err(ParseError::NoClassName { line: line_num + 1 }),
             };
+
+            // Check if name is valid
+            if !class_name_pattern
+              .is_match(name)
+              .expect("Failed checking regex match. This error should NEVER APPEAR!")
+            {
+              return Err(ParseError::InvalidClassName {
+                name: name.to_string(),
+                line: line_num + 1,
+              });
+            }
+
+            // Get value
             let value = match split.next() {
               Some(x) => x.trim(),
               None => return Err(ParseError::NoClassValue { line: line_num + 1 }),
             };
 
+            // Insert class
             classes.insert(name.to_string(), value.to_string());
           }
 
@@ -65,7 +82,12 @@ impl Phoner {
             let intent = first != '!';
 
             // Add rule
-            rules.push((intent, chars.as_str().replace(" ", ""), reason_ref, line_num));
+            rules.push((
+              intent,
+              chars.as_str().replace(" ", ""),
+              reason_ref,
+              line_num,
+            ));
           }
 
           // Test

@@ -199,8 +199,6 @@ See the [examples](./examples/) folder for `phoner` file examples.
 - Change class substitution strategy
 - - Find `/<.*>/` in string
 - - Replace w value or return error if invalid name
-- Add constraints to class names
-- - Return error if not met
 - Fix 'line number' error tracing with semicolon use... how ?
 - Add minify method on `Phoner` struct
 - Add more docs !
