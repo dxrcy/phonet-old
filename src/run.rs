@@ -1,6 +1,6 @@
 use crate::{
   args::DisplayLevel::{self, *},
-  scheme::Phoner,
+  parse::Phoner,
   types::{Rules, TestDefinition, TestResult},
 };
 use Reason::*;

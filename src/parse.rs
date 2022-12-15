@@ -1,35 +1,10 @@
-use std::fmt::Display;
-
 use fancy_regex::Regex;
 
-use crate::types::{Classes, Rules, TestDefinition};
-use ParseError::*;
-
-/// Error enum for `Phoner` struct
-pub enum ParseError {
-  UnknownIntentIdentifier(char),
-  UnknownLineOperator(char),
-  UnknownClass(char),
-  NoClassName,
-  NoClassValue,
-  RegexFail(fancy_regex::Error),
-}
-
-impl Display for ParseError {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    match self {
-      UnknownIntentIdentifier(ch) => write!(
-        f,
-        "Unknown intent identifier `{ch}`. Must be either `+` or `!`"
-      ),
-      UnknownLineOperator(ch) => write!(f, "Unknown line operator `{ch}`"),
-      UnknownClass(name) => write!(f, "Unknown class `{name}`"),
-      NoClassName => write!(f, "No class name given"),
-      NoClassValue => write!(f, "No class value given"),
-      RegexFail(err) => write!(f, "Failed to parse Regex: {err}"),
-    }
-  }
-}
+use crate::types::{
+  Classes,
+  ParseError::{self, *},
+  Rules, TestDefinition,
+};
 
 /// Scheme parsed from file
 ///
@@ -53,7 +28,7 @@ impl Phoner {
     let mut reason_ref: Option<usize> = None;
 
     // Split at semicolon or line
-    for line in file.replace(";", "\n").lines() {
+    for (line_num, line) in file.replace(";", "\n").lines().enumerate() {
       let line = line.trim();
 
       // Continue for blank
@@ -74,11 +49,11 @@ impl Phoner {
 
             let name = match split.next() {
               Some(x) => x.trim(),
-              None => return Err(ParseError::NoClassName),
+              None => return Err(ParseError::NoClassName { line: line_num + 1 }),
             };
             let value = match split.next() {
               Some(x) => x.trim(),
-              None => return Err(ParseError::NoClassValue),
+              None => return Err(ParseError::NoClassValue { line: line_num + 1 }),
             };
 
             classes.insert(name.to_string(), value.to_string());
@@ -90,7 +65,7 @@ impl Phoner {
             let intent = first != '!';
 
             // Add rule
-            rules.push((intent, chars.as_str().replace(" ", ""), reason_ref));
+            rules.push((intent, chars.as_str().replace(" ", ""), reason_ref, line_num));
           }
 
           // Test
@@ -110,7 +85,10 @@ impl Phoner {
 
               // Unknown character
               Some(ch) => {
-                return Err(UnknownIntentIdentifier(ch));
+                return Err(UnknownIntentIdentifier {
+                  ch,
+                  line: line_num + 1,
+                });
               }
               // No character
               None => continue,
@@ -155,13 +133,20 @@ impl Phoner {
           }
 
           // Unknown
-          _ => return Err(UnknownLineOperator(first)),
+          _ => {
+            return Err(UnknownLineOperator {
+              ch: first,
+              line: line_num + 1,
+            })
+          }
         }
       }
     }
 
+    let rules = make_regex(rules, &classes)?;
+
     Ok(Phoner {
-      rules: make_regex(rules, &classes)?,
+      rules,
       tests,
       reasons,
     })
@@ -170,15 +155,20 @@ impl Phoner {
 
 /// Substitute classes in rule and create regex
 fn make_regex(
-  raw_rules: Vec<(bool, String, Option<usize>)>,
+  raw_rules: Vec<(bool, String, Option<usize>, usize)>,
   classes: &Classes,
 ) -> Result<Rules, ParseError> {
   let mut rules = Rules::new();
 
-  for (intent, rule, reason) in raw_rules {
+  for (intent, rule, reason, line_num) in raw_rules {
     let re = match Regex::new(&substitute_classes(rule, classes)?) {
       Ok(x) => x,
-      Err(err) => return Err(RegexFail(err)),
+      Err(err) => {
+        return Err(RegexFail {
+          err,
+          line: line_num + 1,
+        })
+      }
     };
 
     rules.push((intent, re, reason));

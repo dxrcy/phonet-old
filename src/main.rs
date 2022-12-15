@@ -3,16 +3,17 @@ use std::fs;
 use clap::Parser;
 use phoner::{types::TestDefinition, Args, Phoner, PhonerResults};
 
-fn main() -> Result<(), String> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
   let args = Args::parse();
 
   // Read file
-  //TODO Change this! To expect ?
-  let file = fs::read_to_string(&args.file)
-    .map_err(|err| format!("Could not read file '{}' - {:?}", args.file, err))?;
+  let file = fs::read_to_string(&args.file)?;
 
   // Parse file
-  let mut scheme = Phoner::parse(&file).map_err(|x| format!("Could not parse file: {x}"))?;
+  let mut scheme = match Phoner::parse(&file) {
+    Ok(x) => x,
+    Err(err) => panic!("Failed to parse file: {err}"),
+  };
 
   // Use CLI tests if given
   if let Some(tests) = args.tests {

@@ -1,8 +1,8 @@
 mod args;
-mod scheme;
-mod tests;
+mod parse;
+mod run;
 pub mod types;
 
 pub use args::{Args, DisplayLevel};
-pub use scheme::{ParseError, Phoner};
-pub use tests::PhonerResults;
+pub use parse::Phoner;
+pub use run::PhonerResults;
