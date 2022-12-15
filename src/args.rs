@@ -1,11 +1,14 @@
 use std::fmt::Display;
 
-use clap::{Parser, ValueEnum};
+use clap::{builder::PossibleValue, Parser, ValueEnum};
 
 use DisplayLevel::*;
 
 #[derive(Parser)]
-#[clap(author, version, about)]
+#[clap(author, version)]
+/// A program to validate phonotactic patterns
+///
+/// More information: https://github.com/darccyy/phoner
 pub struct Args {
   /// Custom test, separate with comma (Ignores tests in file)
   pub tests: Option<String>,
@@ -19,7 +22,8 @@ pub struct Args {
   pub display_level: DisplayLevel,
 }
 
-#[derive(ValueEnum, Clone)]
+/// Setting for controlling which items are outputted in `PhonerResult::display` method
+#[derive(Clone)]
 pub enum DisplayLevel {
   /// Show everything (passes, notes, fails)
   ShowAll,
@@ -29,6 +33,39 @@ pub enum DisplayLevel {
   JustFails,
   /// Show nothing: not passes, notes, or fails
   HideAll,
+}
+
+// Custom implementation, for shorthand values
+impl ValueEnum for DisplayLevel {
+  fn to_possible_value(&self) -> Option<clap::builder::PossibleValue> {
+    // `help` values must mirror comments
+    Some(match self {
+      Self::ShowAll => PossibleValue::new("show-all")
+        .aliases(["s", "show", "sa", "showall"])
+        .help("Show everything (passes, notes, fails)"),
+
+      Self::NotesAndFails => PossibleValue::new("notes-and-fails")
+        .aliases(["n", "notesfails", "notes", "na"])
+        .help("Show most (notes, fails), but not passes"),
+
+      Self::JustFails => PossibleValue::new("just-fails")
+        .aliases(["j", "f", "fails", "justfails"])
+        .help("Show only fails, not passes or notes"),
+
+      Self::HideAll => PossibleValue::new("hide-all")
+        .aliases(["h", "hide", "ha", "hideall"])
+        .help("Show nothing: not passes, notes, or fails"),
+    })
+  }
+
+  fn value_variants<'a>() -> &'a [Self] {
+    &[
+      Self::ShowAll,
+      Self::NotesAndFails,
+      Self::JustFails,
+      Self::HideAll,
+    ]
+  }
 }
 
 impl Default for DisplayLevel {
