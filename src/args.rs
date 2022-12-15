@@ -13,11 +13,17 @@ pub struct Args {
   /// Custom test, separate with comma (Ignores tests in file)
   pub tests: Option<String>,
 
-  /// Path of file to parse and test
+  /// Name and path of file to run and test
+  ///
+  /// Eg. `phoner -f ./myfile.phoner`
   #[arg(short, long, default_value_t = String::from("phoner"))]
   pub file: String,
 
-  /// Don't display passing tests to output
+  /// What types of outputs to display
+  ///
+  /// Options can be single letter
+  ///
+  /// Eg. `phoner -d just-fails` or `phoner -df`
   #[arg(short, long, default_value_t = ShowAll, value_enum)]
   pub display_level: DisplayLevel,
 }

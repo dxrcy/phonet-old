@@ -1,7 +1,7 @@
 use std::fs;
 
 use clap::Parser;
-use phoner::{types::TestDefinition, Args, Phoner, PhonerResults};
+use phoner::{prelude::*, types::TestDefinition, Args};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
   let args = Args::parse();

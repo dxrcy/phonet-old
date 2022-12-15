@@ -15,26 +15,82 @@ This project can be used as a rust library, or as a binary.
 
 [Download latest version here](https://github.com/darccyy/phoner/releases/latest)
 
-//TODO Add more explanation
-
-<!-- add to $env:path -->
-
-<!-- argument explanation -->
-
-Argument syntax:
+### Argument syntax
 
 ```
-$ phoner -h
+$ phoner --help
+
 Usage: phoner.exe [OPTIONS] [TESTS]
 
 Arguments:
-  [TESTS]  Custom test, separate with comma (Ignores tests in file)
+  [TESTS]
+      Custom test, separate with comma (Ignores tests in file)
 
 Options:
-  -f, --file <FILE>                    Path of file to parse and test [default: phoner]
-  -d, --display-level <DISPLAY_LEVEL>  Don't display passing tests to output [default: show-all] [possible values: show-all, notes-and-fails, just-fails, hide-all]
-  -h, --help                           Print help information (use `--help` for more detail)
-  -V, --version                        Print version information
+  -f, --file <FILE>
+      Name and path of file to run and test
+
+      Eg. `phoner -f ./myfile.phoner`
+
+      [default: phoner]
+
+  -d, --display-level <DISPLAY_LEVEL>
+      What types of outputs to display
+
+      Options can be single letter
+
+      Eg. `phoner -d just-fails` or `phoner -df`
+
+      [default: show-all]
+
+      Possible values:
+        - show-all:        Show everything (passes, notes, fails)
+        - notes-and-fails: Show most (notes, fails), but not passes
+        - just-fails:      Show only fails, not passes or notes
+        - hide-all:        Show nothing: not passes, notes, or fails
+
+  -h, --help
+      Print help information (use `-h` for a summary)
+```
+
+### Example
+
+```bash
+# Runs ./phoner
+phoner
+
+# Runs ./phoner, with tests: 'some', 'words' (instead of tests in file)
+phoner some,words
+
+# Runs ./myfile.phoner
+phoner -f myfile.phoner
+
+# Runs ./phoner, only showing fails
+phoner -df
+# Alternatives:
+phoner -d just-fails
+phoner -d fails
+```
+
+### Create Alias / Path
+
+Replace `<path_to_file>` with the directory of the downloaded binary.
+
+#### Bash
+
+Add alias in `.bashrc` in user directory
+
+```bash
+# ~/.bashrc
+alias phoner="<path_to_file>/phoner.exe"
+```
+
+#### Powershell
+
+Add to `$env:PATH`
+
+```ps1
+$env:Path = "$env:Path;<path_to_file>\phoner.exe"
 ```
 
 ## Library use
@@ -44,7 +100,7 @@ Add `phoner = {git = "https://github.com/darccyy/phoner.git"}` to your `Crates.t
 **Crates.io** and **Docs.rs** coming soon...
 
 ```rs
-use phoner::{DisplayLevel, Phoner, PhonerResults};
+use phoner::prelude::*;
 use std::fs;
 
 fn main() {
@@ -53,8 +109,11 @@ fn main() {
   // Parse file
   let scheme = Phoner::parse(&file).expect("Failed to parse");
 
-  // Run tests and display
-  PhonerResults::run(scheme).display(DisplayLevel::ShowAll);
+  // Run tests
+  let results = PhonerResults::run(scheme);
+
+  // Display results
+  results.display(DisplayLevel::ShowAll);
 }
 ```
 
