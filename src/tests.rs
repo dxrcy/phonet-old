@@ -1,10 +1,10 @@
 use crate::{
   args::DisplayLevel::{self, *},
   scheme::Phoner,
-  types::{Rules, TestDef, TestResult},
+  types::{Rules, TestDefinition, TestResult},
 };
 use Reason::*;
-use Validity::*;
+use ValidStatus::*;
 
 /// Results from `run_tests` function
 pub struct PhonerResults {
@@ -34,10 +34,10 @@ impl PhonerResults {
     for test in scheme.tests {
       match test {
         // Note - simply add to list
-        TestDef::Note(note) => list.push(TestResult::Note(note)),
+        TestDefinition::Note(note) => list.push(TestResult::Note(note)),
 
         // Test - Validate test, check validity with intent, create reason for failure
-        TestDef::Test { intent, word } => {
+        TestDefinition::Test { intent, word } => {
           // Validate test
           let validity = validate_test(&word, &scheme.rules);
 
@@ -214,7 +214,7 @@ pub enum Reason {
 }
 
 impl Reason {
-  fn from(validity: Validity, reasons: &Vec<String>) -> Self {
+  fn from(validity: ValidStatus, reasons: &Vec<String>) -> Self {
     match validity {
       // Test was valid, but it should have not matched
       Valid => ShouldNotHaveMatched,
@@ -242,12 +242,12 @@ impl Reason {
 /// If invalid, reason can be provided
 ///
 /// ? Make public ?
-enum Validity {
+enum ValidStatus {
   Valid,
   Invalid(Option<usize>),
 }
 
-impl Validity {
+impl ValidStatus {
   /// Returns `true` if state is `Valid`
   pub fn is_valid(&self) -> bool {
     if let Valid = self {
@@ -279,7 +279,9 @@ impl Validity {
 }
 
 /// Check if string is valid with rules
-fn validate_test(word: &str, rules: &Rules) -> Validity {
+/// 
+/// ? Make public ?
+fn validate_test(word: &str, rules: &Rules) -> ValidStatus {
   // Check for match with every rule, if not, return reason
   for (should_match, rule, reason_ref) in rules {
     // Check if rule matches, and whether match signifies returning invalid or continuing

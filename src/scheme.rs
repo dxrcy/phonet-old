@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use fancy_regex::Regex;
 
-use crate::types::{Classes, Rules, TestDef};
+use crate::types::{Classes, Rules, TestDefinition};
 use ParseError::*;
 
 /// Error enum for `Phoner` struct
@@ -37,7 +37,7 @@ impl Display for ParseError {
 #[derive(Debug)]
 pub struct Phoner {
   pub rules: Rules,
-  pub tests: Vec<TestDef>,
+  pub tests: Vec<TestDefinition>,
   pub reasons: Vec<String>,
 }
 
@@ -122,7 +122,7 @@ impl Phoner {
               // Add test
               let word = word.trim().to_string();
               if !word.is_empty() {
-                tests.push(TestDef::Test { intent, word });
+                tests.push(TestDefinition::Test { intent, word });
               }
             }
           }
@@ -137,7 +137,7 @@ impl Phoner {
             // Reason note
             if chars.as_str().starts_with('*') {
               chars.next();
-              tests.push(TestDef::Note(chars.as_str().trim().to_string()));
+              tests.push(TestDefinition::Note(chars.as_str().trim().to_string()));
             }
 
             // Add reason
@@ -149,7 +149,7 @@ impl Phoner {
           '*' => {
             let msg = chars.as_str().trim().to_string();
             if !msg.is_empty() {
-              tests.push(TestDef::Note(msg));
+              tests.push(TestDefinition::Note(msg));
             }
             continue;
           }

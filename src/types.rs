@@ -12,7 +12,7 @@ pub type Classes = HashMap<String, String>;
 
 /// Definition of test or note
 #[derive(Debug)]
-pub enum TestDef {
+pub enum TestDefinition {
   /// Display line of text
   Note(String),
   /// Result of test

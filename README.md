@@ -196,10 +196,6 @@ See the [examples](./examples/) folder for `phoner` file examples.
 
 # TODO
 
-- Clean types, structs, enums
-- - Location
-- - Names
-- - Field / variant names
 - Fix error handling !!!
 - - Return error type that implements `std::error::Error`
 - Add more docs !
