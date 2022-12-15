@@ -277,6 +277,5 @@ See the [examples](./examples/) folder for `phoner` file examples.
 - - Replace w value or return error if invalid name
 - Fix 'line number' error tracing with semicolon use... how ?
 - Add minify method on `Phoner` struct
-- Add more docs !
 - Add tests !
 - Remove unnecessary `clone`s where possible
