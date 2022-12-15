@@ -197,6 +197,7 @@ See the [examples](./examples/) folder for `phoner` file examples.
 # TODO
 
 - Fix error handling !!!
+- Add minify method on `Phoner` struct
 - - Return error type that implements `std::error::Error`
 - Add more docs !
 - Add tests !
