@@ -191,6 +191,9 @@ Example (with predefined rules):
 
 See the [examples](./examples/) folder for `phoner` file examples.
 
+- [Syntax Examples](./examples/phoner)
+- [Toki Pona](./examples/tokipona.phoner)
+
 # TODO
 
 - Clean types, structs, enums
