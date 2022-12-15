@@ -189,7 +189,12 @@ See the [examples](./examples/) folder for `phoner` file examples.
 
 # TODO
 
-- Separate test runner and test printer
-- Fix error handling
-- Add docs !
+- Clean types, structs, enums
+- - Location
+- - Names
+- - Field / variant names
+- Fix error handling !!!
+- - Return error type that implements `std::error::Error`
+- Add more docs !
 - Add tests !
+- Remove unnecessary `clone`s where possible

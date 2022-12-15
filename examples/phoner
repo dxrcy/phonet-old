@@ -2,8 +2,14 @@ $V = [iueoa]
 $C = [pbtdkgmnfvszcwjl]
 $X = [<V><C>]
 
+# no reason
+  ! x
+    ?+ axa
+    ?! ata
+
 @ Contains invalid letters
-+ ^ <X>+ $
+  + ^ <X>+ $
+    ?+ aoi123
 
 $S = [sc]
 $N = [mn]
@@ -45,7 +51,7 @@ $N = [mn]
 ? + stono
 * Some note
 ? ! sbono
-? + skono smono snono3
+? + skono smono snono
 * Some other note
 ? + cnono
 ? + cpono

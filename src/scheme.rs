@@ -19,7 +19,9 @@ type Classes = HashMap<String, String>;
 /// ? Move intent to this enum ?
 #[derive(Debug)]
 pub enum TestType {
+  ///
   Note(String),
+  /// TODO Change to inline struct
   Test(bool, String),
 }
 

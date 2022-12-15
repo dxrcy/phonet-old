@@ -1,7 +1,7 @@
 use std::fs;
 
 use clap::Parser;
-use phoner::{run_tests, Args, Scheme, TestType};
+use phoner::{display_results, run_tests, Args, Scheme, TestType};
 
 fn main() -> Result<(), String> {
   let args = Args::parse();
@@ -19,7 +19,9 @@ fn main() -> Result<(), String> {
       .collect();
   }
 
-  run_tests(scheme, args.display_level);
+  let results = run_tests(scheme);
+
+  display_results(&results, args.display_level);
 
   Ok(())
 }

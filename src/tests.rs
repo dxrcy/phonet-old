@@ -1,115 +1,198 @@
 use crate::{
-  args::DisplayLevel::{self, *},
+  args::DisplayLevel,
   scheme::{Rules, Scheme, TestType},
   Validity::{self, *},
 };
+use Reason::*;
 
-/// Run tests, output result
-pub fn run_tests(scheme: Scheme, display_level: DisplayLevel) {
+/// Results from `run_tests` function
+pub struct TestResults {
+  /// List of results of each test
+  list: Vec<ResultType>,
+  /// Amount of failed tests
+  fail_count: u32,
+  /// Length of longest word in tests
+  /// TODO Fix with DisplayLevel -- will increase len for passing test, even if not displayed
+  max_word_len: usize,
+}
+
+impl TestResults {
+  /// Create empty `TestResults`
+  pub fn empty() -> Self {
+    TestResults {
+      list: Vec::new(),
+      fail_count: 0,
+      max_word_len: 0,
+    }
+  }
+}
+
+/// Result of one test, or note
+pub enum ResultType {
+  /// Display line of text
+  Note(String),
+  /// Result of test
+  Test {
+    /// Intent of test passing
+    intent: bool,
+    /// Word tested
+    word: String,
+    /// Whether test passed or not
+    pass: bool,
+    /// Reason for fail
+    reason: Reason,
+  },
+}
+
+/// Reason for failure variants
+pub enum Reason {
+  /// Test passed, do not display reason
+  Passed,
+  /// No reason was given for rule for test failing
+  NoReasonGiven,
+  /// Test matched, but should have not
+  ShouldNotHaveMatched,
+  /// Custom reason for rule
+  Custom(String),
+}
+
+/// Run tests, return results
+pub fn run_tests(scheme: Scheme) -> TestResults {
+  // No tests
   if scheme.tests.len() < 1 {
+    return TestResults::empty();
+  }
+
+  // Builders
+  let mut list = vec![];
+  let mut fail_count = 0;
+  let mut max_word_len = 0;
+
+  // Loop tests
+  for test in scheme.tests {
+    match test {
+      // Note - simply add to list
+      TestType::Note(note) => list.push(ResultType::Note(note)),
+
+      // Test - Validate test, check validity with intent, create reason for failure
+      TestType::Test(intent, word) => {
+        // Validate test
+        let reason = validate_test(&word, &scheme.rules);
+
+        // Check if validity status with test intent
+        let pass = !(reason.is_valid() ^ intent);
+
+        // Create reason
+        let reason = if !pass {
+          // Test failed - Some reason
+          match reason {
+            // Test was valid, but it should have not matched
+            Valid => ShouldNotHaveMatched,
+
+            // Test was invalid, but it should have matched
+            Invalid(reason) => match reason {
+              // No reason was given for rule
+              None => NoReasonGiven,
+
+              // Find rule reason in scheme
+              Some(reason) => match scheme.reasons.get(reason) {
+                // Rule found - Custom reason
+                Some(x) => Reason::Custom(x.to_string()),
+                // No rule found
+                // ? this should not happen ever ?
+                None => NoReasonGiven,
+              },
+            },
+          }
+        } else {
+          // Test passed - No reason for failure needed
+          Passed
+        };
+
+        // Increase fail count if failed
+        if !pass {
+          fail_count += 1;
+        }
+
+        // Increase max length if word is longer than current max
+        if word.len() > max_word_len {
+          max_word_len = word.len();
+        }
+
+        // Add test result to list
+        list.push(ResultType::Test {
+          intent,
+          word,
+          pass,
+          reason,
+        });
+      }
+    }
+  }
+
+  TestResults {
+    list,
+    fail_count,
+    max_word_len,
+  }
+}
+
+/// Display results to standard output
+/// 
+/// This can be implemented manually
+///
+/// TODO Add DisplayLevel
+pub fn display_results(results: &TestResults, _display_level: DisplayLevel) {
+  // No tests
+  if results.list.len() < 1 {
     println!("\n\x1b[33mNo tests to run.\x1b[0m");
     return;
   }
 
-  println!("\n\x1b[3;33mRunning {} tests...\x1b[0m", scheme.tests.len());
+  // Header
+  println!("\n\x1b[3;33mRunning {} tests...\x1b[0m", results.list.len());
 
-  // Get max length of all words
-  let max_word_len = scheme
-    .tests
-    .iter()
-    .map(|test| {
-      if let TestType::Test(_, word) = test {
-        word.len()
-      } else {
-        0
+  for item in &results.list {
+    match item {
+      // Display note
+      ResultType::Note(note) => println!("\x1b[34m{note}\x1b[0m"),
+
+      // Display test
+      ResultType::Test {
+        intent,
+        word,
+        pass,
+        reason,
+      } => {
+        // Format reason
+        let reason = match &reason {
+          Passed => "",
+          ShouldNotHaveMatched => "\x1b[33mMatched, but should have not\x1b[0m",
+          NoReasonGiven => "No reason given",
+          Custom(reason) => &reason,
+        };
+
+        // Display test status
+        println!(
+          "  \x1b[{intent}\x1b[0m {word}{space}  \x1b[1;{result} \x1b[0;3;1m{reason}\x1b[0m",
+          intent = if *intent { "36m✔" } else { "35m✗" },
+          space = " ".repeat(results.max_word_len - word.len()),
+          result = if *pass { "32mpass" } else { "31mFAIL" },
+        );
       }
-    })
-    .max()
-    .unwrap_or(0);
-
-  // Test each word, tally fails
-  let mut fails = 0;
-  let mut is_first_print = true;
-  for test in scheme.tests {
-    let (intent, word) = match test {
-      TestType::Note(note) => {
-        match display_level {
-          ShowAll | NotesAndFails => {
-            // Blank line if is first print
-            if is_first_print {
-              println!();
-            }
-
-            // Print note
-            println!("\x1b[34m{note}\x1b[0m");
-            is_first_print = false;
-          }
-          _ => (),
-        }
-        continue;
-      }
-      TestType::Test(intent, word) => (intent, word),
-    };
-
-    // Validate word against rules, get reason for invalid
-    let reason = validate_test(&word, &scheme.rules);
-
-    // Check if test result matches intended result
-    let passed = !(reason.is_valid() ^ intent);
-
-    // Define reason for test fail
-    let reason = if !passed {
-      reason.unwrap_or(
-        "\x1b[33mMatched, but should have not\x1b[0m",
-        "No reason given",
-        &scheme.reasons,
-      )
-    } else {
-      ""
-    };
-
-    // Check if should output
-    if match display_level {
-      // Always show
-      ShowAll => true,
-      // Only show if failed
-      NotesAndFails | JustFails if !passed => true,
-      // Else skip
-      _ => false,
-    } {
-      // Blank line if is first print
-      if is_first_print {
-        println!();
-      }
-
-      // Output single result
-      println!(
-        "  \x1b[{intent}\x1b[0m {word}{space}  \x1b[1;{result} \x1b[0;3;1m{reason}\x1b[0m",
-        intent = if intent { "36m✔" } else { "35m✗" },
-        result = if passed { "32mpass" } else { "31mFAIL" },
-        space = " ".repeat(max_word_len - word.len()),
-      );
-      is_first_print = false;
-    }
-
-    // Increase fails tally if failed
-    if !passed {
-      fails += 1;
     }
   }
 
-  // Blank line if there was test print
-  if !is_first_print {
-    println!();
-  }
-
-  // Output final result
-  if fails == 0 {
+  // Final print
+  if results.fail_count == 0 {
+    // All passed
     println!("\x1b[32;1;3mAll tests pass!\x1b[0m");
   } else {
+    // Some failed
     println!(
       "\x1b[31;1;3m{fails} test{s} failed!\x1b[0m",
-      s = if fails == 1 { "" } else { "s" }
+      fails = results.fail_count,
+      s = if results.fail_count == 1 { "" } else { "s" },
     );
   }
 }

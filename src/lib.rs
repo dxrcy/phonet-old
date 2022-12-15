@@ -4,7 +4,7 @@ mod tests;
 
 pub use args::{Args, DisplayLevel};
 pub use scheme::{ParseError, Scheme, TestType};
-pub use tests::run_tests;
+pub use tests::{run_tests, display_results};
 
 use Validity::*;
 
@@ -28,7 +28,7 @@ impl Validity {
   /// Unwrap reason with default
   ///
   /// Replaces reference to reason with value
-  pub fn unwrap_or<'a>(
+  pub fn _unwrap_or<'a>(
     self,
     if_valid: &'a str,
     if_none: &'a str,
