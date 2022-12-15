@@ -19,7 +19,7 @@ $N = [mn]
 @ Basic structure
   + ^ <S>? (<C>? <V> <N>?)+ $
     ?+ pono
-    ? + stono
+    ? + stononononononononononononononon
     ? +slono ; ? + sonto
     ?+ ato
 

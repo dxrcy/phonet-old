@@ -200,7 +200,6 @@ See the [examples](./examples/) folder for `phoner` file examples.
 - - Location
 - - Names
 - - Field / variant names
-- Fix max word len with display level
 - Fix error handling !!!
 - - Return error type that implements `std::error::Error`
 - Add more docs !

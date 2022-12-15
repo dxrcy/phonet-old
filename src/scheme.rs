@@ -3,7 +3,6 @@ use std::fmt::Display;
 use fancy_regex::Regex;
 
 use crate::types::{Classes, Rules, TestDef};
-
 use ParseError::*;
 
 /// Error enum for `Phoner` struct
@@ -32,17 +31,16 @@ impl Display for ParseError {
   }
 }
 
-#[derive(Debug)]
 /// Scheme parsed from file
 ///
 /// Holds rules and tests
+#[derive(Debug)]
 pub struct Phoner {
   pub rules: Rules,
   pub tests: Vec<TestDef>,
   pub reasons: Vec<String>,
 }
 
-//TODO Rename this
 impl Phoner {
   /// Parse `Scheme` from file
   pub fn parse(file: &str) -> Result<Phoner, ParseError> {

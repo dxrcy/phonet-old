@@ -23,7 +23,7 @@ pub struct Args {
 }
 
 /// Setting for controlling which items are outputted in `PhonerResult::display` method
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub enum DisplayLevel {
   /// Show everything (passes, notes, fails)
   ShowAll,

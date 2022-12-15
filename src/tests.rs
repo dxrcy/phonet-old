@@ -12,9 +12,6 @@ pub struct PhonerResults {
   list: Vec<TestResult>,
   /// Amount of failed tests
   fail_count: u32,
-  /// Length of longest word in tests
-  /// TODO Fix with DisplayLevel -- will increase len for passing test, even if not displayed
-  max_word_len: usize,
 }
 
 impl PhonerResults {
@@ -25,7 +22,6 @@ impl PhonerResults {
       return PhonerResults {
         list: Vec::new(),
         fail_count: 0,
-        max_word_len: 0,
       };
     }
 
@@ -78,11 +74,30 @@ impl PhonerResults {
       }
     }
 
-    PhonerResults {
-      list,
-      fail_count,
-      max_word_len,
-    }
+    PhonerResults { list, fail_count }
+  }
+
+  /// Get maximum length of all test words
+  fn max_word_len(&self, display_level: DisplayLevel) -> usize {
+    self
+      .list
+      .iter()
+      .map(|x| match x {
+        // Test - Check display level
+        TestResult::Test { word, pass, .. } => match display_level {
+          // Always include
+          ShowAll => word.len(),
+          // Only include if failed
+          NotesAndFails | JustFails if !pass => word.len(),
+          // Don't include
+          _ => 0,
+        },
+        // Note
+        _ => 0,
+      })
+      .max()
+      // Default value
+      .unwrap_or(10)
   }
 
   /// Display results to standard output
@@ -97,6 +112,9 @@ impl PhonerResults {
 
     // Header
     println!("\n\x1b[3;33mRunning {} tests...\x1b[0m", self.list.len());
+
+    // Get maximum length of all test words
+    let max_word_len = self.max_word_len(display_level);
 
     // Loop result list
     let mut is_first_print = true;
@@ -156,7 +174,7 @@ impl PhonerResults {
           println!(
             "  \x1b[{intent}\x1b[0m {word}{space}  \x1b[1;{result} \x1b[0;3;1m{reason}\x1b[0m",
             intent = if *intent { "36m✔" } else { "35m✗" },
-            space = " ".repeat(self.max_word_len - word.len()),
+            space = " ".repeat(max_word_len - word.len()),
             result = if *pass { "32mpass" } else { "31mFAIL" },
           );
         }
@@ -222,7 +240,7 @@ impl Reason {
 /// State of rules match of word
 ///
 /// If invalid, reason can be provided
-/// 
+///
 /// ? Make public ?
 enum Validity {
   Valid,
