@@ -1,5 +1,5 @@
 use crate::{
-  args::DisplayLevel,
+  args::DisplayLevel::{self, *},
   scheme::{Rules, Scheme, TestType},
   Validity::{self, *},
 };
@@ -138,11 +138,9 @@ pub fn run_tests(scheme: Scheme) -> TestResults {
 }
 
 /// Display results to standard output
-/// 
-/// This can be implemented manually
 ///
-/// TODO Add DisplayLevel
-pub fn display_results(results: &TestResults, _display_level: DisplayLevel) {
+/// This can be implemented manually
+pub fn display_results(results: &TestResults, display_level: DisplayLevel) {
   // No tests
   if results.list.len() < 1 {
     println!("\n\x1b[33mNo tests to run.\x1b[0m");
@@ -152,10 +150,26 @@ pub fn display_results(results: &TestResults, _display_level: DisplayLevel) {
   // Header
   println!("\n\x1b[3;33mRunning {} tests...\x1b[0m", results.list.len());
 
+  // Loop result list
+  let mut is_first_print = true;
   for item in &results.list {
     match item {
       // Display note
-      ResultType::Note(note) => println!("\x1b[34m{note}\x1b[0m"),
+      ResultType::Note(note) => match display_level {
+        // Always show
+        ShowAll | NotesAndFails => {
+          // Blank line for first print
+          if is_first_print {
+            println!();
+            is_first_print = false;
+          }
+
+          // Print note
+          println!("\x1b[34m{note}\x1b[0m")
+        }
+        // Else skip
+        _ => (),
+      },
 
       // Display test
       ResultType::Test {
@@ -164,6 +178,18 @@ pub fn display_results(results: &TestResults, _display_level: DisplayLevel) {
         pass,
         reason,
       } => {
+        // Skip if not required by display level
+        if match display_level {
+          // Always show
+          ShowAll => false,
+          // Only show if failed
+          NotesAndFails | JustFails if !pass => false,
+          // Else skip
+          _ => true,
+        } {
+          continue;
+        }
+
         // Format reason
         let reason = match &reason {
           Passed => "",
@@ -171,6 +197,12 @@ pub fn display_results(results: &TestResults, _display_level: DisplayLevel) {
           NoReasonGiven => "No reason given",
           Custom(reason) => &reason,
         };
+
+        // Blank line for first print
+        if is_first_print {
+          println!();
+          is_first_print = false;
+        }
 
         // Display test status
         println!(
@@ -181,6 +213,11 @@ pub fn display_results(results: &TestResults, _display_level: DisplayLevel) {
         );
       }
     }
+  }
+
+  // Blank line if there was tests or notes displayed
+  if !is_first_print {
+    println!();
   }
 
   // Final print
