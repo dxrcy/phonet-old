@@ -15,12 +15,11 @@ $S = [sc]
 $N = [mn]
 
 @ Basic structure
-+ ^ <S>? (<C>? <V> <N>?)+ $
-
-?+ pono
-? + stono
-? +slono ; ? + sonto
-?+ ato
+  + ^ <S>? (<C>? <V> <N>?)+ $
+    ?+ pono
+    ? + stono
+    ? +slono ; ? + sonto
+    ?+ ato
 
   # aowidj
 
@@ -39,35 +38,32 @@ $N = [mn]
 ? ! taata
 
 @ More than 2 seq. consonants
-! <C> {3}
+  ! <C> {3}
 
-? + apa
-? ! aspla assa asssa
+    ? + apa
+    ? ! aspla assa asssa
 
 @ Sibilant before anything other than [ptkmnl]
-! <S> [bdgfvszcwj]
-
-? + spono
-? + stono
-* Some note
-? ! sbono
-? + skono smono snono
-* Some other note
-? + cnono
-? + cpono
-? ! cgono
+  ! <S> [bdgfvszcwj]
+    ? + spono
+    ? + stono
+    * Some note
+    ? ! sbono
+    ? + skono smono snono
+    * Some other note
+    ? + cnono
+    ? + cpono
+    ? ! cgono
 
 @* j|w beside i|u respectively
-! ji
-! ij
-! wu ; ! uw
-
-? ! aji
-? + aju
-? ! awu
+    ! ji
+    ! ij
+    ! wu ; ! uw
+        ? ! aji
+        ? + aju
+        ? ! awu
 
 @ Some more tests
 
-? + telo
-? + tenlo
+? + telo tenlo
 ? ! telno

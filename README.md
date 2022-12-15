@@ -11,15 +11,11 @@ This program is still in development, and is subject to change.
 
 This project can be used as a rust library, or as a binary.
 
-## Library use
-
-Add `phoner = {git = "https://github.com/darccyy/phoner.git"}` to your `Crates.toml` file
-
-**Crates.io** and **Docs.rs** coming soon...
-
 ## Binary use
 
 [Download latest version here](https://github.com/darccyy/phoner/releases/latest)
+
+//TODO Add more explanation
 
 Argument syntax:
 
@@ -36,6 +32,14 @@ Options:
   -h, --help                           Print help information (use `--help` for more detail)
   -V, --version                        Print version information
 ```
+
+## Library use
+
+Add `phoner = {git = "https://github.com/darccyy/phoner.git"}` to your `Crates.toml` file
+
+**Crates.io** and **Docs.rs** coming soon...
+
+//TODO Add example
 
 # File syntax
 
