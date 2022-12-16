@@ -48,6 +48,12 @@ Options:
         - notes-and-fails: Show most (notes, fails), but not passes
         - just-fails:      Show only fails, not passes or notes
         - hide-all:        Show nothing: not passes, notes, or fails
+        
+  -m, --minify [<MINIFY>]
+      Minify file and save
+
+      Possible values:
+        - tests: Include tests
 
   -h, --help
       Print help information (use `-h` for a summary)
@@ -70,6 +76,12 @@ phoner -df
 # Alternatives:
 phoner -d just-fails
 phoner -d fails
+
+# Runs ./phoner, and minifies to ./min.phoner without tests
+phoner -m
+
+# Runs ./myfile.phoner, without outputting any results, and minifies to ./myfile.min.phoner with tests
+phoner -f myfile.phoner -dh -mt
 ```
 
 ### Create Alias / Path
