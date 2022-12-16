@@ -22,11 +22,10 @@ $ phoner --help
 
 Usage: phoner.exe [OPTIONS] [TESTS]
 
-Arguments:
-  [TESTS]
+Options:
+  -t, --tests <TESTS>
       Custom test, separate with comma (Ignores tests in file)
 
-Options:
   -f, --file <FILE>
       Name and path of file to run and test
 
@@ -66,7 +65,7 @@ Options:
 phoner
 
 # Runs ./phoner, with tests: 'some', 'words' (instead of tests in file)
-phoner some,words
+phoner -t some,words
 
 # Runs ./myfile.phoner
 phoner -f myfile.phoner
@@ -284,7 +283,6 @@ See the [examples](./examples/) folder for `phoner` file examples.
 
 # TODO
 
-- Fix 'line number' error tracing with semicolon use... how ?
 - Add more docs
 - Change class substitution strategy
 - - Find `/<.*>/` in string

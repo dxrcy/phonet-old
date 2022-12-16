@@ -53,147 +53,150 @@ impl Phoner {
 
     let class_name_pattern = Regex::new(r"^\w+$").expect("Could not parse static regex");
 
-    // Split at semicolon or line
-    for (line_num, line) in file.replace(";", "\n").lines().enumerate() {
-      let line = line.trim();
+    // Split at line
+    for (line_num, line) in file.lines().enumerate() {
+      // Split line at semicolon
+      for line in line.split(";") {
+        let line = line.trim();
 
-      // Continue for blank
-      if line.is_empty() {
-        continue;
-      }
+        // Continue for blank
+        if line.is_empty() {
+          continue;
+        }
 
-      let mut chars = line.chars();
+        let mut chars = line.chars();
 
-      if let Some(first) = chars.next() {
-        match first {
-          // Comment
-          '#' => continue,
+        if let Some(first) = chars.next() {
+          match first {
+            // Comment
+            '#' => continue,
 
-          // Class
-          '$' => {
-            let mut split = chars.as_str().split("=");
+            // Class
+            '$' => {
+              let mut split = chars.as_str().split("=");
 
-            // Get name
-            let name = match split.next() {
-              Some(x) => x.trim(),
-              None => return Err(ParseError::NoClassName { line: line_num + 1 }),
-            };
+              // Get name
+              let name = match split.next() {
+                Some(x) => x.trim(),
+                None => return Err(ParseError::NoClassName { line: line_num + 1 }),
+              };
 
-            // Check if name is valid
-            if !class_name_pattern
-              .is_match(name)
-              .expect("Failed checking regex match. This error should NEVER APPEAR!")
-            {
-              return Err(ParseError::InvalidClassName {
-                name: name.to_string(),
-                line: line_num + 1,
-              });
-            }
-
-            // Get value
-            let value = match split.next() {
-              Some(x) => x.trim(),
-              None => return Err(ParseError::NoClassValue { line: line_num + 1 }),
-            };
-
-            // Insert class
-            classes.insert(name.to_string(), value.to_string());
-
-            // Add raw line
-            mini.classes.push(format!("${}={}", name, value));
-          }
-
-          // Rule
-          '+' | '!' => {
-            // `+` for true, `!` for false
-            let intent = first != '!';
-
-            let rule = chars.as_str().replace(" ", "");
-
-            // Add rule for minify
-            mini.rules.push(first.to_string() + &rule);
-
-            // Add rule
-            rules.push((intent, rule, reason_ref, line_num));
-          }
-
-          // Test
-          '?' => {
-            // Remove spaces
-            while chars.as_str().starts_with(' ') {
-              chars.next();
-            }
-
-            // Check intent
-            // `+` for true, `!` for false
-            let intent = match chars.next() {
-              // Should be INVALID to pass
-              Some('+') => true,
-              // Should be VALID to pass
-              Some('!') => false,
-
-              // Unknown character
-              Some(ch) => {
-                return Err(UnknownIntentIdentifier {
-                  ch,
+              // Check if name is valid
+              if !class_name_pattern
+                .is_match(name)
+                .expect("Failed checking regex match. This error should NEVER APPEAR!")
+              {
+                return Err(ParseError::InvalidClassName {
+                  name: name.to_string(),
                   line: line_num + 1,
                 });
               }
-              // No character
-              None => continue,
-            };
 
-            // Split at space
-            let words = chars.as_str().split_whitespace();
-            for word in words {
-              let word = word.trim().to_string();
+              // Get value
+              let value = match split.next() {
+                Some(x) => x.trim(),
+                None => return Err(ParseError::NoClassValue { line: line_num + 1 }),
+              };
 
-              // Add test for minify
-              if intent {
-                mini.tests_pos.push(word.clone());
-              } else {
-                mini.tests_neg.push(word.clone());
+              // Insert class
+              classes.insert(name.to_string(), value.to_string());
+
+              // Add raw line
+              mini.classes.push(format!("${}={}", name, value));
+            }
+
+            // Rule
+            '+' | '!' => {
+              // `+` for true, `!` for false
+              let intent = first != '!';
+
+              let rule = chars.as_str().replace(" ", "");
+
+              // Add rule for minify
+              mini.rules.push(first.to_string() + &rule);
+
+              // Add rule
+              rules.push((intent, rule, reason_ref, line_num));
+            }
+
+            // Test
+            '?' => {
+              // Remove spaces
+              while chars.as_str().starts_with(' ') {
+                chars.next();
               }
 
-              // Add test
-              if !word.is_empty() {
-                tests.push(TestDefinition::Test { intent, word });
+              // Check intent
+              // `+` for true, `!` for false
+              let intent = match chars.next() {
+                // Should be INVALID to pass
+                Some('+') => true,
+                // Should be VALID to pass
+                Some('!') => false,
+
+                // Unknown character
+                Some(ch) => {
+                  return Err(UnknownIntentIdentifier {
+                    ch,
+                    line: line_num + 1,
+                  });
+                }
+                // No character
+                None => continue,
+              };
+
+              // Split at space
+              let words = chars.as_str().split_whitespace();
+              for word in words {
+                let word = word.trim().to_string();
+
+                // Add test for minify
+                if intent {
+                  mini.tests_pos.push(word.clone());
+                } else {
+                  mini.tests_neg.push(word.clone());
+                }
+
+                // Add test
+                if !word.is_empty() {
+                  tests.push(TestDefinition::Test { intent, word });
+                }
               }
             }
-          }
 
-          // Reason
-          '@' => {
-            // Remove spaces
-            while chars.as_str().starts_with(' ') {
-              chars.next();
+            // Reason
+            '@' => {
+              // Remove spaces
+              while chars.as_str().starts_with(' ') {
+                chars.next();
+              }
+
+              // Reason note
+              if chars.as_str().starts_with('*') {
+                chars.next();
+                tests.push(TestDefinition::Note(chars.as_str().trim().to_string()));
+              }
+
+              // Add reason
+              reasons.push(chars.as_str().trim().to_string());
+              reason_ref = Some(reasons.len() - 1);
             }
 
-            // Reason note
-            if chars.as_str().starts_with('*') {
-              chars.next();
-              tests.push(TestDefinition::Note(chars.as_str().trim().to_string()));
+            // Note
+            '*' => {
+              let msg = chars.as_str().trim().to_string();
+              if !msg.is_empty() {
+                tests.push(TestDefinition::Note(msg));
+              }
             }
 
-            // Add reason
-            reasons.push(chars.as_str().trim().to_string());
-            reason_ref = Some(reasons.len() - 1);
-          }
-
-          // Note
-          '*' => {
-            let msg = chars.as_str().trim().to_string();
-            if !msg.is_empty() {
-              tests.push(TestDefinition::Note(msg));
+            // Unknown
+            _ => {
+              return Err(UnknownLineOperator {
+                ch: first,
+                line: line_num + 1,
+              })
             }
-          }
-
-          // Unknown
-          _ => {
-            return Err(UnknownLineOperator {
-              ch: first,
-              line: line_num + 1,
-            })
           }
         }
       }
