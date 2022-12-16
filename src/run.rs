@@ -6,7 +6,9 @@ use crate::{
 use Reason::*;
 use ValidStatus::*;
 
-/// Results from `run_tests` function
+/// Results from run tests
+/// 
+/// Create with `PhonerResults::run()`
 pub struct PhonerResults {
   /// List of results of each test
   list: Vec<TestResult>,
