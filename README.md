@@ -1,6 +1,6 @@
 # Phoner
 
-Phoner is a CLI tool to validate phonotactic patterns for constructed languages.
+Phoner is a CLI tool and library to validate phonotactic patterns for constructed languages.
 It is compatible with either romanization and phonetic transcription.
 
 [Syntax Highlighting Extension for VSCode](https://github.com/darccyy/phoner-syntax)
@@ -47,7 +47,7 @@ Options:
         - notes-and-fails: Show most (notes, fails), but not passes
         - just-fails:      Show only fails, not passes or notes
         - hide-all:        Show nothing: not passes, notes, or fails
-        
+
   -m, --minify [<MINIFY>]
       Minify file and save
 
@@ -106,9 +106,10 @@ $env:Path = "$env:Path;<path_to_file>\phoner.exe"
 
 ## Library use
 
-Add `phoner = {git = "https://github.com/darccyy/phoner.git"}` to your `Crates.toml` file
+Add `phoner = "0.5.3"` to your `Crates.toml` file
 
-**Crates.io** and **Docs.rs** coming soon...
+- [Docs.rs](https://docs.rs/phoner/latest/phoner)
+- [Crates.io](https://crates.io/crates/phoner)
 
 ```rs
 use phoner::prelude::*;
