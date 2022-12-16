@@ -6,6 +6,26 @@ use crate::types::{
   Rules, TestDefinition,
 };
 
+/// Holds data for minify
+#[derive(Debug)]
+struct Mini {
+  classes: Vec<String>,
+  rules: Vec<String>,
+  tests_pos: Vec<String>,
+  tests_neg: Vec<String>,
+}
+
+impl Mini {
+  pub fn new() -> Self {
+    Mini {
+      classes: Vec::new(),
+      rules: Vec::new(),
+      tests_pos: Vec::new(),
+      tests_neg: Vec::new(),
+    }
+  }
+}
+
 /// Scheme parsed from file
 ///
 /// Holds rules and tests
@@ -14,6 +34,7 @@ pub struct Phoner {
   pub rules: Rules,
   pub tests: Vec<TestDefinition>,
   pub reasons: Vec<String>,
+  mini: Mini,
 }
 
 impl Phoner {
@@ -26,6 +47,9 @@ impl Phoner {
 
     let mut reasons = Vec::new();
     let mut reason_ref: Option<usize> = None;
+
+    // For minify
+    let mut mini = Mini::new();
 
     let class_name_pattern = Regex::new(r"^\w+$").expect("Could not parse static regex");
 
@@ -74,6 +98,9 @@ impl Phoner {
 
             // Insert class
             classes.insert(name.to_string(), value.to_string());
+
+            // Add raw line
+            mini.classes.push(format!("${}={}", name, value));
           }
 
           // Rule
@@ -81,13 +108,13 @@ impl Phoner {
             // `+` for true, `!` for false
             let intent = first != '!';
 
+            let rule = chars.as_str().replace(" ", "");
+
+            // Add rule for minify
+            mini.rules.push(first.to_string() + &rule);
+
             // Add rule
-            rules.push((
-              intent,
-              chars.as_str().replace(" ", ""),
-              reason_ref,
-              line_num,
-            ));
+            rules.push((intent, rule, reason_ref, line_num));
           }
 
           // Test
@@ -119,8 +146,16 @@ impl Phoner {
             // Split at space
             let words = chars.as_str().split_whitespace();
             for word in words {
-              // Add test
               let word = word.trim().to_string();
+
+              // Add test for minify
+              if intent {
+                mini.tests_pos.push(word.clone());
+              } else {
+                mini.tests_neg.push(word.clone());
+              }
+
+              // Add test
               if !word.is_empty() {
                 tests.push(TestDefinition::Test { intent, word });
               }
@@ -151,7 +186,6 @@ impl Phoner {
             if !msg.is_empty() {
               tests.push(TestDefinition::Note(msg));
             }
-            continue;
           }
 
           // Unknown
@@ -171,7 +205,31 @@ impl Phoner {
       rules,
       tests,
       reasons,
+      mini,
     })
+  }
+
+  /// Minify Phoner scheme as string
+  pub fn minify(&self, do_tests: bool) -> String {
+    if do_tests {
+      // Include tests
+      format!(
+        "{c}{s}{r}{s}?+{tp}{s}?!{tn}",
+        s = ";",
+        c = self.mini.classes.join(";"),
+        r = self.mini.rules.join(";"),
+        tp = self.mini.tests_pos.join(" "),
+        tn = self.mini.tests_neg.join(" "),
+      )
+    } else {
+      // Don't include tests
+      format!(
+        "{c}{s}{r}",
+        s = ";",
+        c = self.mini.classes.join(";"),
+        r = self.mini.rules.join(";"),
+      )
+    }
   }
 }
 

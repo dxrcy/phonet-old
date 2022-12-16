@@ -2,6 +2,7 @@ use std::fmt::Display;
 
 use clap::{builder::PossibleValue, Parser, ValueEnum};
 
+// use crate::types::Ternary;
 use DisplayLevel::*;
 
 #[derive(Parser)]
@@ -11,6 +12,7 @@ use DisplayLevel::*;
 /// More information: https://github.com/darccyy/phoner
 pub struct Args {
   /// Custom test, separate with comma (Ignores tests in file)
+  #[arg(short, long)]
   pub tests: Option<String>,
 
   /// Name and path of file to run and test
@@ -26,6 +28,48 @@ pub struct Args {
   /// Eg. `phoner -d just-fails` or `phoner -df`
   #[arg(short, long, default_value_t = ShowAll, value_enum)]
   pub display_level: DisplayLevel,
+
+  /// Minify file and save
+  #[arg(short, long, value_enum)]
+  pub minify: Option<Option<ArgBool>>,
+}
+
+//TODO ==================
+//TODO move to `types.rs`
+//TODO ==================
+
+#[derive(Clone, Copy, Debug)]
+/// Custom implementation of boolean, for argument aliases
+pub enum ArgBool {
+  True,
+  False,
+}
+
+// Custom implementation, for argument aliases
+impl ValueEnum for ArgBool {
+  fn to_possible_value(&self) -> Option<clap::builder::PossibleValue> {
+    Some(match self {
+      Self::True => PossibleValue::new("true").aliases(["t"]).help("true value"),
+
+      Self::False => PossibleValue::new("false")
+        .aliases(["f"])
+        .help("false value"),
+    })
+  }
+
+  fn value_variants<'a>() -> &'a [Self] {
+    &[Self::True, Self::False]
+  }
+}
+
+impl ArgBool {
+  /// Convert to boolean
+  pub fn bool(&self) -> bool {
+    match self {
+      Self::True => true,
+      Self::False => false,
+    }
+  }
 }
 
 /// Setting for controlling which items are outputted in `PhonerResult::display` method
@@ -41,7 +85,7 @@ pub enum DisplayLevel {
   HideAll,
 }
 
-// Custom implementation, for shorthand values
+// Custom implementation, for argument aliases
 impl ValueEnum for DisplayLevel {
   fn to_possible_value(&self) -> Option<clap::builder::PossibleValue> {
     // `help` values must mirror comments

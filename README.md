@@ -272,10 +272,10 @@ See the [examples](./examples/) folder for `phoner` file examples.
 
 # TODO
 
+- Fix 'line number' error tracing with semicolon use... how ?
+- Add more docs
 - Change class substitution strategy
 - - Find `/<.*>/` in string
 - - Replace w value or return error if invalid name
-- Fix 'line number' error tracing with semicolon use... how ?
-- Add minify method on `Phoner` struct
 - Add tests !
 - Remove unnecessary `clone`s where possible

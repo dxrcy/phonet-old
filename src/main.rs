@@ -26,8 +26,58 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
       .collect();
   }
 
+  // Minify file
+  if let Some(do_tests) = args.minify {
+    // Parse arg
+    let do_tests = match do_tests {
+      Some(x) => x.bool(),
+      None => false,
+    };
+
+    fs::write(get_min_filename(&args.file), scheme.minify(do_tests))?;
+  }
+
   // Run tests and display
   PhonerResults::run(scheme).display(args.display_level);
 
   Ok(())
+}
+
+/// Adds '.min' to filename, before last file extension
+///
+/// Returns empty string if filename is empty
+#[allow(dead_code)]
+fn get_min_filename(file: &str) -> String {
+  let mut split = file.split('.');
+
+  match split.next_back() {
+    // None or empty - Empty string
+    None | Some("") => String::new(),
+
+    // Some filename
+    Some(last) => {
+      let rest: Vec<&str> = split.collect();
+
+      if rest.len() > 0 {
+        // Filename and extension
+        rest.join(".") + ".min." + last
+      } else {
+        // No extension or only extension (no filename)
+        "min.".to_string() + last
+      }
+    }
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn get_min_filename_works() {
+    assert_eq!(get_min_filename(""), "");
+    assert_eq!(get_min_filename("phoner"), "min.phoner");
+    assert_eq!(get_min_filename("myfile.phoner"), "myfile.min.phoner");
+    assert_eq!(get_min_filename("one.two.phoner"), "one.two.min.phoner");
+  }
 }

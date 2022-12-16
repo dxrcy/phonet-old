@@ -1,10 +1,12 @@
 use std::collections::HashMap;
-// error::Error, fmt::Display
 
+// use clap::{builder::PossibleValue, ValueEnum};
 use fancy_regex::Regex;
 use snafu::prelude::*;
 
 pub use crate::run::Reason;
+
+// use Ternary::*;
 
 /// Error enum for `Phoner` struct in `parse.rs`
 #[derive(Debug, Snafu)]
@@ -69,3 +71,48 @@ pub enum TestResult {
     reason: Reason,
   },
 }
+
+// /// ???
+// #[derive(Clone, Copy)]
+// pub enum Ternary {
+//   True,
+//   False,
+//   Null,
+// }
+
+// // Custom implementation, for shorthand values
+// impl ValueEnum for Ternary {
+//   fn to_possible_value(&self) -> Option<clap::builder::PossibleValue> {
+//     // `help` values must mirror comments
+//     Some(match self {
+//       Self::True => PossibleValue::new("true").aliases(["t"]).help("True value"),
+
+//       Self::False => PossibleValue::new("false")
+//         .aliases(["f"])
+//         .help("False value"),
+
+//         Self
+//     })
+//   }
+
+//   fn value_variants<'a>() -> &'a [Self] {
+//     &[Self::True, Self::False]
+//   }
+// }
+
+// impl Ternary {
+//   pub fn is_some(&self) -> bool {
+//     match self {
+//       True | False => true,
+//       Null => false,
+//     }
+//   }
+
+//   pub fn bool(&self) -> bool {
+//     match self {
+//       True => true,
+//       False => false,
+//       Null => panic!("Tried to convert Null ternary to boolean"),
+//     }
+//   }
+// }
