@@ -1,7 +1,10 @@
+mod args;
+
 use std::fs;
 
+use args::Args;
 use clap::Parser;
-use phoner::{prelude::*, types::TestDefinition, Args};
+use phoner::{prelude::*, types::TestDefinition};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
   let args = Args::parse();

@@ -1,12 +1,11 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::Display};
 
-// use clap::{builder::PossibleValue, ValueEnum};
+use clap::{ValueEnum, builder::PossibleValue};
 use fancy_regex::Regex;
 use snafu::prelude::*;
 
 pub use crate::run::Reason;
-
-// use Ternary::*;
+use DisplayLevel::*;
 
 /// Error enum for `Phoner` struct in `parse.rs`
 #[derive(Debug, Snafu)]
@@ -72,47 +71,69 @@ pub enum TestResult {
   },
 }
 
-// /// ???
-// #[derive(Clone, Copy)]
-// pub enum Ternary {
-//   True,
-//   False,
-//   Null,
-// }
+/// Setting for controlling which items are outputted in `PhonerResult::display` method
+#[derive(Clone, Copy)]
+pub enum DisplayLevel {
+  /// Show everything (passes, notes, fails)
+  ShowAll,
+  /// Show most (notes, fails), but not passes
+  NotesAndFails,
+  /// Show only fails, not passes or notes
+  JustFails,
+  /// Show nothing: not passes, notes, or fails
+  HideAll,
+}
 
-// // Custom implementation, for shorthand values
-// impl ValueEnum for Ternary {
-//   fn to_possible_value(&self) -> Option<clap::builder::PossibleValue> {
-//     // `help` values must mirror comments
-//     Some(match self {
-//       Self::True => PossibleValue::new("true").aliases(["t"]).help("True value"),
+// Custom implementation, for argument aliases
+impl ValueEnum for DisplayLevel {
+  fn to_possible_value(&self) -> Option<clap::builder::PossibleValue> {
+    // `help` values must mirror comments
+    Some(match self {
+      Self::ShowAll => PossibleValue::new("show-all")
+        .aliases(["s", "show", "sa", "showall"])
+        .help("Show everything (passes, notes, fails)"),
 
-//       Self::False => PossibleValue::new("false")
-//         .aliases(["f"])
-//         .help("False value"),
+      Self::NotesAndFails => PossibleValue::new("notes-and-fails")
+        .aliases(["n", "notesfails", "notes", "na"])
+        .help("Show most (notes, fails), but not passes"),
 
-//         Self
-//     })
-//   }
+      Self::JustFails => PossibleValue::new("just-fails")
+        .aliases(["j", "f", "fails", "justfails"])
+        .help("Show only fails, not passes or notes"),
 
-//   fn value_variants<'a>() -> &'a [Self] {
-//     &[Self::True, Self::False]
-//   }
-// }
+      Self::HideAll => PossibleValue::new("hide-all")
+        .aliases(["h", "hide", "ha", "hideall"])
+        .help("Show nothing: not passes, notes, or fails"),
+    })
+  }
 
-// impl Ternary {
-//   pub fn is_some(&self) -> bool {
-//     match self {
-//       True | False => true,
-//       Null => false,
-//     }
-//   }
+  fn value_variants<'a>() -> &'a [Self] {
+    &[
+      Self::ShowAll,
+      Self::NotesAndFails,
+      Self::JustFails,
+      Self::HideAll,
+    ]
+  }
+}
 
-//   pub fn bool(&self) -> bool {
-//     match self {
-//       True => true,
-//       False => false,
-//       Null => panic!("Tried to convert Null ternary to boolean"),
-//     }
-//   }
-// }
+impl Default for DisplayLevel {
+  fn default() -> Self {
+    ShowAll
+  }
+}
+
+impl Display for DisplayLevel {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    write!(
+      f,
+      "{}",
+      match self {
+        ShowAll => "ShowAll",
+        NotesAndFails => "NotesAndFails",
+        JustFails => "JustFails",
+        HideAll => "HideAll",
+      }
+    )
+  }
+}

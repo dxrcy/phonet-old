@@ -1,7 +1,7 @@
 use crate::{
-  args::DisplayLevel::{self, *},
-  parse::Phoner,
+  Phoner,
   types::{Rules, TestDefinition, TestResult},
+  DisplayLevel::{self, *},
 };
 use Reason::*;
 use ValidStatus::*;
