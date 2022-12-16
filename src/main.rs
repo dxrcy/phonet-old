@@ -28,13 +28,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
   // Minify file
   if let Some(do_tests) = args.minify {
-    // Parse arg
-    let do_tests = match do_tests {
-      Some(x) => x.bool(),
-      None => false,
-    };
-
-    fs::write(get_min_filename(&args.file), scheme.minify(do_tests))?;
+    fs::write(
+      get_min_filename(&args.file),
+      scheme.minify(do_tests.is_some()),
+    )?;
   }
 
   // Run tests and display

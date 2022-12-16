@@ -31,46 +31,33 @@ pub struct Args {
 
   /// Minify file and save
   #[arg(short, long, value_enum)]
-  pub minify: Option<Option<ArgBool>>,
+  pub minify: Option<Option<WithTests>>,
+}
+
+#[derive(Clone, Copy, Debug)]
+/// Custom implementation of boolean, for argument aliases
+pub enum WithTests {
+  Tests,
+}
+
+// Custom implementation, for argument aliases
+impl ValueEnum for WithTests {
+  fn to_possible_value(&self) -> Option<clap::builder::PossibleValue> {
+    Some(match self {
+      Self::Tests => PossibleValue::new("tests")
+        .aliases(["t"])
+        .help("Include tests"),
+    })
+  }
+
+  fn value_variants<'a>() -> &'a [Self] {
+    &[Self::Tests]
+  }
 }
 
 //TODO ==================
 //TODO move to `types.rs`
 //TODO ==================
-
-#[derive(Clone, Copy, Debug)]
-/// Custom implementation of boolean, for argument aliases
-pub enum ArgBool {
-  True,
-  False,
-}
-
-// Custom implementation, for argument aliases
-impl ValueEnum for ArgBool {
-  fn to_possible_value(&self) -> Option<clap::builder::PossibleValue> {
-    Some(match self {
-      Self::True => PossibleValue::new("true").aliases(["t"]).help("true value"),
-
-      Self::False => PossibleValue::new("false")
-        .aliases(["f"])
-        .help("false value"),
-    })
-  }
-
-  fn value_variants<'a>() -> &'a [Self] {
-    &[Self::True, Self::False]
-  }
-}
-
-impl ArgBool {
-  /// Convert to boolean
-  pub fn bool(&self) -> bool {
-    match self {
-      Self::True => true,
-      Self::False => false,
-    }
-  }
-}
 
 /// Setting for controlling which items are outputted in `PhonerResult::display` method
 #[derive(Clone, Copy)]
