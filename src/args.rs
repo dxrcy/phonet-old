@@ -1,6 +1,6 @@
 use clap::{builder::PossibleValue, Parser, ValueEnum};
 
-use crate::DisplayLevel::{self, *};
+use phoner::DisplayLevel::{self, *};
 
 #[derive(Parser)]
 #[clap(author, version)]

@@ -111,20 +111,38 @@ Add `phoner = "0.5.3"` to your `Crates.toml` file
 - [Docs.rs](https://docs.rs/phoner/latest/phoner)
 - [Crates.io](https://crates.io/crates/phoner)
 
+Short example:
+
 ```rs
-use phoner::prelude::*;
-use std::fs;
+use phoner::Phoner;
 
 fn main() {
-  let file = fs::read_to_string("phoner").unwrap();
+  let file = std::fs::read_to_string("phoner").unwrap();
 
   // Parse file
-  let scheme = Phoner::parse(&file).expect("Failed to parse");
+  Phoner::parse(&file).unwrap()
+    // Run tests
+    .run(scheme)
+    // Display results
+    .display(Default::default());
+}
+```
+
+Long example:
+
+```rs
+use phoner::{Phoner, DisplayLevel};
+
+fn main() {
+  let file = std::fs::read_to_string("phoner").unwrap();
+
+  // Parse file
+  let scheme = Phoner::parse(&file).unwrap();
 
   // Run tests
-  let results = PhonerResults::run(scheme);
+  let results = scheme.run(scheme);
 
-  // Display results
+  // Display results - This could be manually implemented
   results.display(DisplayLevel::ShowAll);
 }
 ```

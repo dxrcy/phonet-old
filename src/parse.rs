@@ -1,10 +1,10 @@
 use fancy_regex::Regex;
 
-use crate::types::{
+use crate::{types::{
   Classes,
   ParseError::{self, *},
   Rules, TestDefinition,
-};
+}, PhonerResults};
 
 /// Holds data for minify
 #[derive(Debug)]
@@ -233,6 +233,10 @@ impl Phoner {
         r = self.mini.rules.join(";"),
       )
     }
+  }
+
+  pub fn run(self) -> PhonerResults {
+    PhonerResults::run(self)
   }
 }
 

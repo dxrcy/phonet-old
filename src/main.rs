@@ -4,7 +4,7 @@ use std::fs;
 
 use args::Args;
 use clap::Parser;
-use phoner::{prelude::*, types::TestDefinition};
+use phoner::{types::TestDefinition, Phoner};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
   let args = Args::parse();
@@ -13,10 +13,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
   let file = fs::read_to_string(&args.file)?;
 
   // Parse file
-  let mut scheme = match Phoner::parse(&file) {
-    Ok(x) => x,
-    Err(err) => panic!("Failed to parse file: {err}"),
-  };
+  let mut scheme = Phoner::parse(&file).expect("Failed to parse file");
 
   // Use CLI tests if given
   if let Some(tests) = args.tests {
@@ -38,7 +35,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
   }
 
   // Run tests and display
-  PhonerResults::run(scheme).display(args.display_level);
+  scheme.run().display(args.display_level);
 
   Ok(())
 }
