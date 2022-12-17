@@ -273,7 +273,7 @@ fn make_regex(raw_rules: Vec<RawRule>, classes: &Classes) -> Result<Vec<Rule>, P
     line_num,
   } in raw_rules
   {
-    let pattern = match Regex::new(&substitute_classes(pattern, classes)?) {
+    let pattern = match Regex::new(&substitute_classes(&pattern, classes, line_num)?) {
       Ok(x) => x,
       Err(err) => {
         return Err(RegexFail {
@@ -293,18 +293,133 @@ fn make_regex(raw_rules: Vec<RawRule>, classes: &Classes) -> Result<Vec<Rule>, P
   Ok(rules)
 }
 
-/// Substitute class names regex rule with class values
-// TODO Optimize this! Sub all classes first, then sub rules
-// TODO Change to not using blind replace - check for /<.>/ then check if class exists
-fn substitute_classes(rule: String, classes: &Classes) -> Result<String, ParseError> {
-  let mut rule = rule;
+/// Substitute class names regex rule with class values (recursively)
+fn substitute_classes(
+  pattern: &str,
+  classes: &Classes,
+  line_num: usize,
+) -> Result<String, ParseError> {
+  let mut output = String::new();
+  let mut name_build: Option<String> = None;
 
-  for (name, value) in classes {
-    let ident = format!("<{}>", name);
-    if rule.contains(&ident) {
-      rule = rule.replace(&ident, &substitute_classes(value.to_string(), classes)?);
+  // Loop characters
+  for ch in pattern.chars() {
+    match ch {
+      // Open class name
+      '<' => {
+        if name_build.is_some() {
+          // Name is already building - Another opening bracket should not be there
+          return Err(ParseError::ClassUnexpectedOpenName {
+            pattern: pattern.to_string(),
+            line: line_num,
+          });
+        }
+
+        // Start building name
+        name_build = Some(String::new());
+      }
+
+      // Close class name
+      '>' => {
+        // Get class name
+        let name = match name_build {
+          Some(x) => x,
+          None => {
+            // No name is building - Closing bracket should not be there
+            return Err(ParseError::ClassUnexpectedCloseName {
+              pattern: pattern.to_string(),
+              line: line_num,
+            });
+          }
+        };
+
+        // Get class value
+        let value = match classes.get(&name) {
+          Some(x) => x,
+          None => {
+            // Class name was not found
+            return Err(ParseError::ClassNotFound {
+              name: name.to_string(),
+              line: line_num,
+            });
+          }
+        };
+
+        // Add value to output (recursively)
+        output.push_str(&substitute_classes(value, classes, line_num)?);
+        // Finish building name
+        name_build = None;
+      }
+
+      // Normal character
+      _ => {
+        if let Some(name) = &mut name_build {
+          // Name is building - push to name
+          name.push(ch);
+        } else {
+          // Name is not building - push to regular output
+          output.push(ch);
+        }
+      }
     }
   }
 
-  Ok(rule)
+  // Class name was not finished building, before end of end of pattern
+  if name_build.is_some() {
+    return Err(ParseError::ClassUnexpectedEnd {
+      pattern: pattern.to_string(),
+      line: line_num,
+    });
+  }
+
+  Ok(output)
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn substitute_classes_works() {
+    let classes = Classes::from([
+      ("C".to_string(), "[ptk]".to_string()),
+      ("Vowels".to_string(), "[aio]".to_string()),
+      ("_".to_string(), "[<C><Vowels>]".to_string()),
+    ]);
+
+    assert_eq!(
+      substitute_classes("<C>", &classes, 0).unwrap(),
+      "[ptk]".to_string()
+    );
+
+    assert_eq!(
+      substitute_classes("<C>-<Vowels>", &classes, 0).unwrap(),
+      "[ptk]-[aio]".to_string()
+    );
+
+    assert_eq!(
+      substitute_classes("<_>", &classes, 0).unwrap(),
+      "[[ptk][aio]]".to_string()
+    );
+
+    assert!(match substitute_classes("<c>", &classes, 0) {
+      Err(ParseError::ClassNotFound { .. }) => true,
+      _ => false,
+    });
+
+    assert!(match substitute_classes("a>b", &classes, 0) {
+      Err(ParseError::ClassUnexpectedCloseName { .. }) => true,
+      _ => false,
+    });
+
+    assert!(match substitute_classes("<a<b>c>", &classes, 0) {
+      Err(ParseError::ClassUnexpectedOpenName { .. }) => true,
+      _ => false,
+    });
+
+    assert!(match substitute_classes("a<b", &classes, 0) {
+      Err(ParseError::ClassUnexpectedEnd { .. }) => true,
+      _ => false,
+    });
+  }
 }

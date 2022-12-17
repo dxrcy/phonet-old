@@ -55,7 +55,7 @@ fn get_min_filename(file: &str) -> String {
     Some(last) => {
       let rest: Vec<&str> = split.collect();
 
-      if rest.is_empty(){
+      if !rest.is_empty() {
         // Filename and extension
         rest.join(".") + ".min." + last
       } else {

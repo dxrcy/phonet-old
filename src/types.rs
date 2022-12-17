@@ -1,6 +1,6 @@
 use std::{collections::HashMap, fmt::Display};
 
-use clap::{ValueEnum, builder::PossibleValue};
+use clap::{builder::PossibleValue, ValueEnum};
 use fancy_regex::Regex;
 use snafu::prelude::*;
 
@@ -32,10 +32,28 @@ pub enum ParseError {
     err: fancy_regex::Error,
     line: usize,
   },
+
+  #[snafu(display("Class not found, with name `{name}`, on line {line}"))]
+  ClassNotFound { name: String, line: usize },
+
+  #[snafu(display(
+    "Unexpected class name opening bracket (`<`), in pattern `{pattern}`, on line {line}"
+  ))]
+  ClassUnexpectedOpenName { pattern: String, line: usize },
+
+  #[snafu(display(
+    "Unexpected class name closing bracket (`>`), in pattern `{pattern}`, on line {line}"
+  ))]
+  ClassUnexpectedCloseName { pattern: String, line: usize },
+
+  #[snafu(display(
+    "Class name was not closed with bracket (`>`) before end of pattern, in pattern `{pattern}`, on line {line}"
+  ))]
+  ClassUnexpectedEnd { pattern: String, line: usize },
 }
 
 #[derive(Debug)]
-pub struct Rule{
+pub struct Rule {
   pub intent: bool,
   pub pattern: Regex,
   pub reason_ref: Option<usize>,

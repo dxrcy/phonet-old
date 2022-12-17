@@ -302,14 +302,7 @@ See the [examples](./examples/) folder for `phoner` file examples.
 
 # TODO
 
-## Must be done before `1.0.0`!!!
-
-- Change class substitution strategy
-- - Find `/<.*>/` in string
-- - Replace w value or return error if invalid name
-
-## Can be done later
-
 - Add more docs
 - Add tests !
+- Refactor modules (without breaking api?)
 - Remove unnecessary `clone`s where possible
