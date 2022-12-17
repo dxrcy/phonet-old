@@ -3,7 +3,7 @@ $C = [pbtdkgmnfvszcwjl]
 # any character
 $_ = [<V><C>]
 
-* note here
+* the first three tests should FAIL in this example
 
 # no reason
   ! x
@@ -13,6 +13,8 @@ $_ = [<V><C>]
 @ Contains invalid letters
   + ^ <_>+ $
     ?+ aoi123
+
+* the rest of the tests should PASS
 
 $S = [sc]
 $N = [mn]
