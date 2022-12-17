@@ -34,8 +34,12 @@ pub enum ParseError {
   },
 }
 
-/// Alias for vector of rules (intent, expression, and invalidity reason)
-pub type Rules = Vec<(bool, Regex, Option<usize>)>;
+#[derive(Debug)]
+pub struct Rule{
+  pub intent: bool,
+  pub pattern: Regex,
+  pub reason_ref: Option<usize>,
+}
 
 /// Alias for hashmap of class name and value
 pub type Classes = HashMap<String, String>;

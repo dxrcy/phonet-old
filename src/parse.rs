@@ -1,10 +1,20 @@
 use fancy_regex::Regex;
 
-use crate::{types::{
-  Classes,
-  ParseError::{self, *},
-  Rules, TestDefinition,
-}, PhonerResults};
+use crate::{
+  types::{
+    Classes,
+    ParseError::{self, *},
+    Rule, TestDefinition,
+  },
+  PhonerResults,
+};
+
+struct RawRule {
+  pub intent: bool,
+  pub pattern: String,
+  pub reason_ref: Option<usize>,
+  pub line_num: usize,
+}
 
 /// Holds data for minify
 #[derive(Debug)]
@@ -37,7 +47,7 @@ impl Mini {
 #[derive(Debug)]
 pub struct Phoner {
   /// Defined rules
-  pub rules: Rules,
+  pub rules: Vec<Rule>,
   /// Tests to run
   pub tests: Vec<TestDefinition>,
   /// Defined reasons values for rules
@@ -50,9 +60,9 @@ impl Phoner {
   /// Parse `Phoner` from string
   pub fn parse(file: &str) -> Result<Phoner, ParseError> {
     // Builders
-    let mut classes = Classes::new();
-    let mut tests = Vec::new();
-    let mut rules = Vec::new();
+    let mut classes: Classes = Classes::new();
+    let mut tests: Vec<TestDefinition> = Vec::new();
+    let mut rules: Vec<RawRule> = Vec::new();
 
     let mut reasons = Vec::new();
     let mut reason_ref: Option<usize> = None;
@@ -119,13 +129,18 @@ impl Phoner {
               // `+` for true, `!` for false
               let intent = first != '!';
 
-              let rule = chars.as_str().replace(" ", "");
+              let pattern = chars.as_str().replace(" ", "");
 
               // Add rule for minify
-              mini.rules.push(first.to_string() + &rule);
+              mini.rules.push(first.to_string() + &pattern);
 
               // Add rule
-              rules.push((intent, rule, reason_ref, line_num));
+              rules.push(RawRule {
+                intent,
+                pattern,
+                reason_ref,
+                line_num,
+              });
             }
 
             // Test
@@ -252,14 +267,17 @@ impl Phoner {
 }
 
 /// Substitute classes in rule and create regex
-fn make_regex(
-  raw_rules: Vec<(bool, String, Option<usize>, usize)>,
-  classes: &Classes,
-) -> Result<Rules, ParseError> {
-  let mut rules = Rules::new();
+fn make_regex(raw_rules: Vec<RawRule>, classes: &Classes) -> Result<Vec<Rule>, ParseError> {
+  let mut rules: Vec<Rule> = Vec::new();
 
-  for (intent, rule, reason, line_num) in raw_rules {
-    let re = match Regex::new(&substitute_classes(rule, classes)?) {
+  for RawRule {
+    intent,
+    pattern,
+    reason_ref,
+    line_num,
+  } in raw_rules
+  {
+    let pattern = match Regex::new(&substitute_classes(pattern, classes)?) {
       Ok(x) => x,
       Err(err) => {
         return Err(RegexFail {
@@ -269,7 +287,11 @@ fn make_regex(
       }
     };
 
-    rules.push((intent, re, reason));
+    rules.push(Rule {
+      intent,
+      pattern,
+      reason_ref,
+    });
   }
 
   Ok(rules)

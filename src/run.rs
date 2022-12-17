@@ -1,13 +1,13 @@
 use crate::{
-  Phoner,
-  types::{Rules, TestDefinition, TestResult},
+  types::{Rule, TestDefinition, TestResult},
   DisplayLevel::{self, *},
+  Phoner,
 };
 use Reason::*;
 use ValidStatus::*;
 
 /// Results from run tests
-/// 
+///
 /// Create with `PhonerResults::run()`
 pub struct PhonerResults {
   /// List of results of each test
@@ -260,12 +260,17 @@ impl ValidStatus {
 }
 
 /// Check if string is valid with rules
-fn validate_test(word: &str, rules: &Rules) -> ValidStatus {
+fn validate_test(word: &str, rules: &Vec<Rule>) -> ValidStatus {
   // Check for match with every rule, if not, return reason
-  for (should_match, rule, reason_ref) in rules {
+  for Rule {
+    intent,
+    pattern,
+    reason_ref,
+  } in rules
+  {
     // Check if rule matches, and whether match signifies returning invalid or continuing
-    if should_match
-      ^ rule
+    if intent
+      ^ pattern
         .is_match(word)
         .expect("Failed checking regex match. This error should NEVER APPEAR!")
     {

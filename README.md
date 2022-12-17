@@ -304,7 +304,6 @@ See the [examples](./examples/) folder for `phoner` file examples.
 
 ## Must be done before `1.0.0`!!!
 
-- Change 'rule' to struct
 - Run clippy
 - Add more docs
 - Change class substitution strategy
