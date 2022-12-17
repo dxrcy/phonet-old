@@ -11,9 +11,9 @@ use ValidStatus::*;
 /// Create with `PhonerResults::run()`
 pub struct PhonerResults {
   /// List of results of each test
-  list: Vec<TestResult>,
+  pub list: Vec<TestResult>,
   /// Amount of failed tests
-  fail_count: u32,
+  pub fail_count: u32,
 }
 
 impl PhonerResults {
