@@ -304,5 +304,6 @@ See the [examples](./examples/) folder for `phoner` file examples.
 
 - Add more docs
 - Add tests !
+- Add more info to `ParseError` variants
 - Refactor modules (without breaking api?)
 - Remove unnecessary `clone`s where possible
