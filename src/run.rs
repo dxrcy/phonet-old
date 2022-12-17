@@ -20,7 +20,7 @@ impl PhonerResults {
   /// Run tests, return results
   pub fn run(scheme: Phoner) -> PhonerResults {
     // No tests
-    if scheme.tests.len() < 1 {
+    if scheme.tests.is_empty() {
       return PhonerResults {
         list: Vec::new(),
         fail_count: 0,
@@ -107,7 +107,7 @@ impl PhonerResults {
   /// This can be implemented manually
   pub fn display(&self, display_level: DisplayLevel) {
     // No tests
-    if self.list.len() < 1 {
+    if self.list.is_empty() {
       println!("\x1b[33mNo tests to run.\x1b[0m");
       return;
     }
@@ -163,7 +163,7 @@ impl PhonerResults {
             Passed => "",
             ShouldNotHaveMatched => "\x1b[33mMatched, but should have not\x1b[0m",
             NoReasonGiven => "No reason given",
-            Custom(reason) => &reason,
+            Custom(reason) => reason,
           };
 
           // Blank line for first print
@@ -216,7 +216,7 @@ pub enum Reason {
 }
 
 impl Reason {
-  fn from(validity: ValidStatus, reasons: &Vec<String>) -> Self {
+  fn from(validity: ValidStatus, reasons: &[String]) -> Self {
     match validity {
       // Test was valid, but it should have not matched
       Valid => ShouldNotHaveMatched,

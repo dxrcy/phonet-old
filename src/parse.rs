@@ -75,7 +75,7 @@ impl Phoner {
     // Split at line
     for (line_num, line) in file.lines().enumerate() {
       // Split line at semicolon
-      for line in line.split(";") {
+      for line in line.split(';') {
         let line = line.trim();
 
         // Continue for blank
@@ -92,7 +92,7 @@ impl Phoner {
 
             // Class
             '$' => {
-              let mut split = chars.as_str().split("=");
+              let mut split = chars.as_str().split('=');
 
               // Get name
               let name = match split.next() {
@@ -129,7 +129,7 @@ impl Phoner {
               // `+` for true, `!` for false
               let intent = first != '!';
 
-              let pattern = chars.as_str().replace(" ", "");
+              let pattern = chars.as_str().replace(' ', "");
 
               // Add rule for minify
               mini.rules.push(first.to_string() + &pattern);
@@ -239,24 +239,20 @@ impl Phoner {
 
   /// Minify Phoner scheme as string
   pub fn minify(&self, do_tests: bool) -> String {
+    let s = ';';
+    let c = self.mini.classes.join(";");
+    let r = self.mini.rules.join(";");
+
     if do_tests {
       // Include tests
       format!(
         "{c}{s}{r}{s}?+{tp}{s}?!{tn}",
-        s = ";",
-        c = self.mini.classes.join(";"),
-        r = self.mini.rules.join(";"),
         tp = self.mini.tests_pos.join(" "),
         tn = self.mini.tests_neg.join(" "),
       )
     } else {
       // Don't include tests
-      format!(
-        "{c}{s}{r}",
-        s = ";",
-        c = self.mini.classes.join(";"),
-        r = self.mini.rules.join(";"),
-      )
+      format!("{c}{s}{r}")
     }
   }
 
@@ -306,7 +302,7 @@ fn substitute_classes(rule: String, classes: &Classes) -> Result<String, ParseEr
   for (name, value) in classes {
     let ident = format!("<{}>", name);
     if rule.contains(&ident) {
-      rule = rule.replace(&ident, &substitute_classes(value.to_string(), &classes)?);
+      rule = rule.replace(&ident, &substitute_classes(value.to_string(), classes)?);
     }
   }
 
