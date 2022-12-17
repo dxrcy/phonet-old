@@ -9,13 +9,18 @@ use crate::{types::{
 /// Holds data for minify
 #[derive(Debug)]
 struct Mini {
+  /// Classes defined
   classes: Vec<String>,
+  /// Rules defined
   rules: Vec<String>,
+  /// Positive tests defined
   tests_pos: Vec<String>,
+  /// Negative tests defined
   tests_neg: Vec<String>,
 }
 
 impl Mini {
+  /// Create empty struct
   pub fn new() -> Self {
     Mini {
       classes: Vec::new(),
@@ -31,14 +36,18 @@ impl Mini {
 /// Holds rules and tests
 #[derive(Debug)]
 pub struct Phoner {
+  /// Defined rules
   pub rules: Rules,
+  /// Tests to run
   pub tests: Vec<TestDefinition>,
+  /// Defined reasons values for rules
   pub reasons: Vec<String>,
+  /// Minified data
   mini: Mini,
 }
 
 impl Phoner {
-  /// Parse `Scheme` from file
+  /// Parse `Phoner` from string
   pub fn parse(file: &str) -> Result<Phoner, ParseError> {
     // Builders
     let mut classes = Classes::new();
@@ -202,6 +211,7 @@ impl Phoner {
       }
     }
 
+    // Convert rules to regex rules
     let rules = make_regex(rules, &classes)?;
 
     Ok(Phoner {
@@ -235,6 +245,7 @@ impl Phoner {
     }
   }
 
+  /// Run tests, return results
   pub fn run(self) -> PhonerResults {
     PhonerResults::run(self)
   }

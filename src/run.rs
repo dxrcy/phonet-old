@@ -241,11 +241,11 @@ impl Reason {
 
 /// State of rules match of word
 ///
-/// If invalid, reason can be provided
-///
-/// ? Make public ?
+/// If invalid, reason reference can be provided
 enum ValidStatus {
+  /// String matches
   Valid,
+  /// String does not match
   Invalid(Option<usize>),
 }
 
@@ -257,32 +257,9 @@ impl ValidStatus {
     }
     false
   }
-
-  /// Unwrap reason with default
-  ///
-  /// Replaces reference to reason with value
-  pub fn _unwrap_or<'a>(
-    self,
-    if_valid: &'a str,
-    if_none: &'a str,
-    reasons: &'a Vec<String>,
-  ) -> &'a str {
-    if let Invalid(reason_ref) = self {
-      return match reason_ref {
-        Some(reason) => match reasons.get(reason) {
-          Some(x) => x,
-          None => if_none,
-        },
-        None => if_none,
-      };
-    }
-    if_valid
-  }
 }
 
 /// Check if string is valid with rules
-///
-/// ? Make public ?
 fn validate_test(word: &str, rules: &Rules) -> ValidStatus {
   // Check for match with every rule, if not, return reason
   for (should_match, rule, reason_ref) in rules {

@@ -1,3 +1,5 @@
+// * This file is just for the binary
+
 use clap::{builder::PossibleValue, Parser, ValueEnum};
 
 use phoner::DisplayLevel::{self, *};
