@@ -304,7 +304,6 @@ See the [examples](./examples/) folder for `phoner` file examples.
 
 ## Must be done before `1.0.0`!!!
 
-- Add more docs
 - Change class substitution strategy
 - - Find `/<.*>/` in string
 - - Replace w value or return error if invalid name
