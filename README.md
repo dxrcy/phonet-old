@@ -173,6 +173,8 @@ The syntax is a statements, each separated by a semicolon `;` or a linebreak.
 
 All whitespace is ignored, except to separate words in [_tests_](#tests).
 
+> Note! This will replace spaces in Regex as well!
+
 Each statement must begin with an operator:
 
 - `#` Hashtag: A whole line comment. A semicolon ends the comment
