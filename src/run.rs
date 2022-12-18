@@ -18,7 +18,7 @@ pub struct PhonerResults {
 
 impl PhonerResults {
   /// Run tests, return results
-  pub fn run(scheme: Phoner) -> PhonerResults {
+  pub fn run(scheme: &Phoner) -> PhonerResults {
     // No tests
     if scheme.tests.is_empty() {
       return PhonerResults {
@@ -33,15 +33,15 @@ impl PhonerResults {
     let mut max_word_len = 0;
 
     // Loop tests
-    for test in scheme.tests {
+    for test in &scheme.tests {
       match test {
         // Note - simply add to list
-        TestDefinition::Note(note) => list.push(TestResult::Note(note)),
+        TestDefinition::Note(note) => list.push(TestResult::Note(note.to_string())),
 
         // Test - Validate test, check validity with intent, create reason for failure
         TestDefinition::Test { intent, word } => {
           // Validate test
-          let validity = validate_test(&word, &scheme.rules);
+          let validity = validate_test(word, &scheme.rules);
 
           // Check if validity status with test intent
           let pass = !(validity.is_valid() ^ intent);
@@ -67,8 +67,8 @@ impl PhonerResults {
 
           // Add test result to list
           list.push(TestResult::Test {
-            intent,
-            word,
+            intent: *intent,
+            word: word.to_string(),
             pass,
             reason,
           });
@@ -242,7 +242,7 @@ impl Reason {
 /// State of rules match of word
 ///
 /// If invalid, reason reference can be provided
-enum ValidStatus {
+pub enum ValidStatus {
   /// String matches
   Valid,
   /// String does not match
@@ -260,7 +260,7 @@ impl ValidStatus {
 }
 
 /// Check if string is valid with rules
-fn validate_test(word: &str, rules: &Vec<Rule>) -> ValidStatus {
+pub fn validate_test(word: &str, rules: &Vec<Rule>) -> ValidStatus {
   // Check for match with every rule, if not, return reason
   for Rule {
     intent,

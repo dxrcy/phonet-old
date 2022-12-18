@@ -13,7 +13,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
   let file = fs::read_to_string(&args.file)?;
 
   // Parse file
-  let mut scheme = Phoner::parse(&file).expect("Failed to parse file");
+  let mut scheme = Phoner::parse(&file)
+    .map_err(|err| err.to_string())
+    .expect("Failed to parse file");
 
   // Use CLI tests if given
   if let Some(tests) = args.tests {
@@ -36,6 +38,33 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
   // Run tests and display
   scheme.run().display(args.display_level);
+
+  // Generate and display random words, if CLI arg given
+  if let Some(count) = args.generate {
+    let count = count.unwrap_or(1);
+
+    // Min and max length
+    // This can be specified in a rule, Eg. `+^.{6,8}$` - only length 6..8
+    let length = 3..14;
+
+    if count > 0 {
+      println!(
+        "\x1b[34mRandomly generated word{s}:\x1b[0m",
+        s = if count == 1 { "" } else { "s" }
+      );
+
+      // Generate words
+      let words = scheme
+        .generate(count, length)
+        .map_err(|err| err.to_string())
+        .expect("Could not generate words");
+
+      // Print words
+      for word in words {
+        println!(" \x1b[36m- \x1b[0;3m{}\x1b[0m", word);
+      }
+    }
+  }
 
   Ok(())
 }

@@ -1,3 +1,4 @@
+$_ = [<C><V>]
 # Pure vowels
 $V = [iueoa]
 # All consonants

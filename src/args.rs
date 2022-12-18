@@ -31,6 +31,10 @@ pub struct Args {
   /// Minify file and save
   #[arg(short, long, value_enum)]
   pub minify: Option<Option<WithTests>>,
+
+  /// Generate random words
+  #[arg(short, long)]
+  pub generate: Option<Option<usize>>,
 }
 
 #[derive(Clone, Copy, Debug)]

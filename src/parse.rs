@@ -3,7 +3,7 @@ use fancy_regex::Regex;
 use crate::{
   types::{
     Classes,
-    ParseError::{self, *},
+    Error::{self, *},
     Rule, TestDefinition,
   },
   PhonerResults,
@@ -52,13 +52,15 @@ pub struct Phoner {
   pub tests: Vec<TestDefinition>,
   /// Defined reasons values for rules
   pub reasons: Vec<String>,
+  /// Classes
+  pub classes: Classes,
   /// Minified data
   mini: Mini,
 }
 
 impl Phoner {
   /// Parse `Phoner` from string
-  pub fn parse(file: &str) -> Result<Phoner, ParseError> {
+  pub fn parse(file: &str) -> Result<Phoner, Error> {
     // Builders
     let mut classes: Classes = Classes::new();
     let mut tests: Vec<TestDefinition> = Vec::new();
@@ -97,7 +99,7 @@ impl Phoner {
               // Get name
               let name = match split.next() {
                 Some(x) => x.trim(),
-                None => return Err(ParseError::NoClassName { line: line_num + 1 }),
+                None => return Err(Error::NoClassName { line: line_num + 1 }),
               };
 
               // Check if name is valid
@@ -105,7 +107,7 @@ impl Phoner {
                 .is_match(name)
                 .expect("Failed checking regex match. This error should NEVER APPEAR!")
               {
-                return Err(ParseError::InvalidClassName {
+                return Err(Error::InvalidClassName {
                   name: name.to_string(),
                   line: line_num + 1,
                 });
@@ -114,7 +116,7 @@ impl Phoner {
               // Get value
               let value = match split.next() {
                 Some(x) => x.trim(),
-                None => return Err(ParseError::NoClassValue { line: line_num + 1 }),
+                None => return Err(Error::NoClassValue { line: line_num + 1 }),
               };
 
               // Insert class
@@ -226,6 +228,13 @@ impl Phoner {
       }
     }
 
+    //TODO MAKE THIS BETTER
+    let mut new_classes = Classes::new();
+    for (k, v) in &classes{ 
+      new_classes.insert(k.to_string(), substitute_classes(v, &classes, 0)?);
+    }
+    let classes = new_classes;
+
     // Convert rules to regex rules
     let rules = make_regex(rules, &classes)?;
 
@@ -233,6 +242,7 @@ impl Phoner {
       rules,
       tests,
       reasons,
+      classes,
       mini,
     })
   }
@@ -257,13 +267,13 @@ impl Phoner {
   }
 
   /// Run tests, return results
-  pub fn run(self) -> PhonerResults {
+  pub fn run(&self) -> PhonerResults {
     PhonerResults::run(self)
   }
 }
 
 /// Substitute classes in rule and create regex
-fn make_regex(raw_rules: Vec<RawRule>, classes: &Classes) -> Result<Vec<Rule>, ParseError> {
+fn make_regex(raw_rules: Vec<RawRule>, classes: &Classes) -> Result<Vec<Rule>, Error> {
   let mut rules: Vec<Rule> = Vec::new();
 
   for RawRule {
@@ -298,7 +308,7 @@ fn substitute_classes(
   pattern: &str,
   classes: &Classes,
   line_num: usize,
-) -> Result<String, ParseError> {
+) -> Result<String, Error> {
   let mut output = String::new();
   let mut name_build: Option<String> = None;
 
@@ -309,7 +319,7 @@ fn substitute_classes(
       '<' => {
         if name_build.is_some() {
           // Name is already building - Another opening bracket should not be there
-          return Err(ParseError::ClassUnexpectedOpenName {
+          return Err(Error::ClassUnexpectedOpenName {
             pattern: pattern.to_string(),
             line: line_num,
           });
@@ -326,7 +336,7 @@ fn substitute_classes(
           Some(x) => x,
           None => {
             // No name is building - Closing bracket should not be there
-            return Err(ParseError::ClassUnexpectedCloseName {
+            return Err(Error::ClassUnexpectedCloseName {
               pattern: pattern.to_string(),
               line: line_num,
             });
@@ -338,7 +348,7 @@ fn substitute_classes(
           Some(x) => x,
           None => {
             // Class name was not found
-            return Err(ParseError::ClassNotFound {
+            return Err(Error::ClassNotFound {
               name: name.to_string(),
               line: line_num,
             });
@@ -366,7 +376,7 @@ fn substitute_classes(
 
   // Class name was not finished building, before end of end of pattern
   if name_build.is_some() {
-    return Err(ParseError::ClassUnexpectedEnd {
+    return Err(Error::ClassUnexpectedEnd {
       pattern: pattern.to_string(),
       line: line_num,
     });
@@ -403,22 +413,22 @@ mod tests {
     );
 
     assert!(match substitute_classes("<c>", &classes, 0) {
-      Err(ParseError::ClassNotFound { .. }) => true,
+      Err(Error::ClassNotFound { .. }) => true,
       _ => false,
     });
 
     assert!(match substitute_classes("a>b", &classes, 0) {
-      Err(ParseError::ClassUnexpectedCloseName { .. }) => true,
+      Err(Error::ClassUnexpectedCloseName { .. }) => true,
       _ => false,
     });
 
     assert!(match substitute_classes("<a<b>c>", &classes, 0) {
-      Err(ParseError::ClassUnexpectedOpenName { .. }) => true,
+      Err(Error::ClassUnexpectedOpenName { .. }) => true,
       _ => false,
     });
 
     assert!(match substitute_classes("a<b", &classes, 0) {
-      Err(ParseError::ClassUnexpectedEnd { .. }) => true,
+      Err(Error::ClassUnexpectedEnd { .. }) => true,
       _ => false,
     });
   }

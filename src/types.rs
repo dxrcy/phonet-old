@@ -9,7 +9,7 @@ use DisplayLevel::*;
 
 /// Error enum for `Phoner` struct in `parse.rs`
 #[derive(Debug, Snafu)]
-pub enum ParseError {
+pub enum Error {
   #[snafu(display("Unknown intent identifier `{ch}`. Must be either `+` or `!`, on line {line}"))]
   UnknownIntentIdentifier { ch: char, line: usize },
 
@@ -50,6 +50,11 @@ pub enum ParseError {
     "Class name was not closed with bracket (`>`) before end of pattern, in pattern `{pattern}`, on line {line}"
   ))]
   ClassUnexpectedEnd { pattern: String, line: usize },
+
+  #[snafu(display(
+    "No 'any' class was defined. Define with `$_ = ...`"
+  ))]
+  MissingAnyClass,
 }
 
 #[derive(Debug)]

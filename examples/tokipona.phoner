@@ -1,5 +1,6 @@
 $C = [ptkmnswlj]
 $V = [iueoa]
+$_ = [<C><V>]
 
 @* Invalid letters
   + ^ [<C><V>]+ $

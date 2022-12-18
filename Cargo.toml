@@ -1,6 +1,6 @@
 [package]
 name = "phoner"
-version = "0.5.5"
+version = "0.6.0"
 edition = "2021"
 description = "A CLI tool and library to validate phonotactic patterns for constructed languages"
 license = "MIT"
@@ -13,4 +13,5 @@ exclude = ["target", "examples/test.min.phoner"]
 [dependencies]
 clap = { version = "4.0.29", features = ["derive"] }
 fancy-regex = "0.10.0"
+rand = "0.8.5"
 snafu = "0.7.3"
