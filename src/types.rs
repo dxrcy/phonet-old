@@ -10,13 +10,19 @@ use DisplayLevel::*;
 /// Error enum for `Phoner` struct in `parse.rs`
 #[derive(Debug, Snafu)]
 pub enum Error {
-  #[snafu(display("Unknown intent identifier `{ch}`. Must be either `+` or `!`, on line {line}"))]
+  #[snafu(display("Unknown intent identifier `{ch}`. Must be either `+` or `!`, at line {line}"))]
   UnknownIntentIdentifier { ch: char, line: usize },
 
-  #[snafu(display("Unknown line operator `{ch}`, on line {line}"))]
+  #[snafu(display("Unknown line operator `{ch}`, at line {line}"))]
   UnknownLineOperator { ch: char, line: usize },
 
-  #[snafu(display("No class name given, on line {line}"))]
+  #[snafu(display("Mode already defined, at line {line}"))]
+  ModeAlreadyDefined { line: usize },
+
+  #[snafu(display("Mode is invalid, it must be one of `<>`, `//`, or `[]`, at line {line}"))]
+  InvalidMode { line: usize },
+
+  #[snafu(display("No class name given, at line {line}"))]
   NoClassName { line: usize },
 
   #[snafu(display(
@@ -27,30 +33,30 @@ pub enum Error {
   #[snafu(display("Class already exists with `{name}`, on {line}"))]
   ClassAlreadyExist { name: String, line: usize },
 
-  #[snafu(display("No class value given, with name `{name}`, on line {line}"))]
+  #[snafu(display("No class value given, with name `{name}`, at line {line}"))]
   NoClassValue { name: String, line: usize },
 
-  #[snafu(display("Failed to parse Regex: {err}, on line {line}"))]
+  #[snafu(display("Failed to parse Regex: {err}, at line {line}"))]
   RegexFail {
     err: fancy_regex::Error,
     line: usize,
   },
 
-  #[snafu(display("Class not found, with name `{name}`, on line {line}"))]
+  #[snafu(display("Class not found, with name `{name}`, at line {line}"))]
   ClassNotFound { name: String, line: usize },
 
   #[snafu(display(
-    "Unexpected class name opening bracket (`<`), in pattern `{pattern}`, on line {line}"
+    "Unexpected class name opening bracket (`<`), in pattern `{pattern}`, at line {line}"
   ))]
   ClassUnexpectedOpenName { pattern: String, line: usize },
 
   #[snafu(display(
-    "Unexpected class name closing bracket (`>`), in pattern `{pattern}`, on line {line}"
+    "Unexpected class name closing bracket (`>`), in pattern `{pattern}`, at line {line}"
   ))]
   ClassUnexpectedCloseName { pattern: String, line: usize },
 
   #[snafu(display(
-    "Class name was not closed with bracket (`>`) before end of pattern, in pattern `{pattern}`, on line {line}"
+    "Class name was not closed with bracket (`>`) before end of pattern, in pattern `{pattern}`, at line {line}"
   ))]
   ClassUnexpectedEnd { pattern: String, line: usize },
 

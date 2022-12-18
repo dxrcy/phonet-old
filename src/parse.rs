@@ -43,6 +43,19 @@ impl Mini {
   }
 }
 
+#[derive(Debug)]
+pub enum Mode {
+  Romanized,
+  Broad,
+  Narrow,
+}
+
+impl Default for Mode {
+  fn default() -> Self {
+    Self::Romanized
+  }
+}
+
 /// Scheme parsed from file
 ///
 /// Holds rules and tests
@@ -56,6 +69,8 @@ pub struct Phoner {
   pub reasons: Vec<String>,
   /// Classes
   pub classes: Classes,
+  /// Mode - This is only semantical
+  pub mode: Mode,
   /// Minified data
   mini: Mini,
 }
@@ -73,6 +88,9 @@ impl Phoner {
 
     // For minify
     let mut mini = Mini::new();
+
+    // Mode
+    let mut mode: Option<Mode> = None;
 
     let class_name_pattern = Regex::new(r"^\w+$").expect("Could not parse static regex");
 
@@ -96,6 +114,29 @@ impl Phoner {
           match first {
             // Comment
             '#' => continue,
+
+            // Mode
+            '%' => {
+              if mode.is_some() {
+                return Err(Error::ModeAlreadyDefined { line });
+              }
+
+              // Remove spaces
+              while chars.as_str().starts_with(' ') {
+                chars.next();
+              }
+
+              // Select mode
+              let next = chars.next();
+              let last = chars.last();
+              mode = match (next, last) {
+                (Some('<'), Some('>')) => Some(Mode::Romanized),
+                (Some('/'), Some('/')) => Some(Mode::Broad),
+                (Some('['), Some(']')) => Some(Mode::Narrow),
+
+                _ => return Err(Error::InvalidMode { line }),
+              };
+            }
 
             // Class
             '$' => {
@@ -243,11 +284,15 @@ impl Phoner {
     // Convert rules to regex rules
     let rules = make_regex(rules, &classes)?;
 
+    // Use default mode if not given
+    let mode = mode.unwrap_or_default();
+
     Ok(Phoner {
       rules,
       tests,
       reasons,
       classes,
+      mode,
       mini,
     })
   }
