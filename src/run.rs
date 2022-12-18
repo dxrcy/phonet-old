@@ -158,7 +158,7 @@ impl PhonerResults {
           println!(
             "  \x1b[{intent}\x1b[0m {word}{space}  \x1b[1;{result} \x1b[0;3;1m{reason}\x1b[0m",
             intent = if *intent { "36m✔" } else { "35m✗" },
-            space = " ".repeat(max_word_len - word.len()),
+            space = " ".repeat(max_word_len - word.chars().count()),
             result = if *pass { "32mpass" } else { "31mFAIL" },
           );
         }
