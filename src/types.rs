@@ -24,8 +24,11 @@ pub enum Error {
   ))]
   InvalidClassName { name: String, line: usize },
 
-  #[snafu(display("No class value given, on line {line}"))]
-  NoClassValue { line: usize },
+  #[snafu(display("Class already exists with `{name}`, on {line}"))]
+  ClassAlreadyExist { name: String, line: usize },
+
+  #[snafu(display("No class value given, with name `{name}`, on line {line}"))]
+  NoClassValue { name: String, line: usize },
 
   #[snafu(display("Failed to parse Regex: {err}, on line {line}"))]
   RegexFail {
@@ -51,9 +54,7 @@ pub enum Error {
   ))]
   ClassUnexpectedEnd { pattern: String, line: usize },
 
-  #[snafu(display(
-    "No 'any' class was defined. Define with `$_ = ...`"
-  ))]
+  #[snafu(display("No 'any' class was defined. Define with `$_ = ...`"))]
   MissingAnyClass,
 }
 

@@ -1,4 +1,4 @@
-$_ = [<C><V>]
+$_ = [pbtdkgmnfvszcwjliueoa]
 # Pure vowels
 $V = [iueoa]
 # All consonants
@@ -11,7 +11,7 @@ $A = [jw]
 $K = [mnlwjsc]
 
 @* Contains unknown letters
-  + ^ [<V><C>]+ $
+  + ^ <_>+ $
     ?+ ivalingo
     ?! ixarinqo
 
@@ -45,7 +45,7 @@ $K = [mnlwjsc]
   ! ij
   ! wu
   ! uw
-    ?+ tuj aju
+    ?+ toj aju
     ?! aji awu
 
 @* 5. Invalid seq. vowels
@@ -58,31 +58,37 @@ $K = [mnlwjsc]
     ?! ui uu ue uo
     ?! ei au oe
 
-@* 6. Approximant before [l]
+@* 6. Invalid diphthongs
+  ! uj
+  ! [ieo]w
+    ?+ ej aj oj aw
+    ?! uj iw ew ow
+
+@* 7. Approximant before [l]
   ! <A> l
     ?+ ajn ajno ajto awto
     ?! ajlo awlo
 
-@* 7. Sequential approximants
+@* 8. Sequential approximants
   ! <A>{2}
     ?! ajjo awjo ajwo
 
-@* 8. Sequential nasals
+@* 9. Sequential nasals
   ! [mn]{2}
     ?+ anta
     ?! amna anma amma
 
-@* 9. [n] before invalid consonant
+@* 10. [n] before invalid consonant
   ! n[pb]
     ?+ ampa
     ?! anpa anba
 
-@* 10. [m] before invalid consonant
+@* 11. [m] before invalid consonant
   ! m[tdszfv]
     ?+ anta
     ?! amta amfa
 
-@* 11. [nml] before approximant
+@* 12. [nml] before approximant
   ! [nml] <A>
     ?+ anta awa
     ?! anwa anja amja

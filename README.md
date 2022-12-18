@@ -2,10 +2,9 @@
 
 Phoner is a CLI tool and library to validate phonotactic patterns for constructed languages.
 It is compatible with either romanization and phonetic transcription.
+Words can be randomly generated (see [Argument Syntax](#argument-syntax)).
 
 [Syntax Highlighting Extension for VSCode](https://github.com/darccyy/phoner-syntax)
-
-This program is still in development, and is subject to change.
 
 # Usage
 
@@ -15,7 +14,7 @@ This project can be used as a rust library, or as a binary.
 
 [Download latest version here](https://github.com/darccyy/phoner/releases/latest)
 
-### Argument syntax
+### Argument Syntax
 
 ```
 $ phoner --help
@@ -181,7 +180,7 @@ Each statement must begin with an operator:
 - `+` **Plus** or `!` **Bang**: Define a [_rule_](#rule)
 - `@` Commat: Define a [_reason_](#reasons) if a test fails
 - `?` Question: Create a [_test_](#tests)
-- `*` Star: Create a test [_note_](#notes)
+- `*` Star: Create a test [_note_](#notes) (also with `@*`)
 
 ## Classes
 
@@ -193,6 +192,8 @@ Syntax:
 - Name - Must be only characters from [a-zA-Z0-9_]
 - `=` Equals
 - Value - Regular Expression, may contain other _classes_ in angle brackets `<>` (as with [_rules_](#rules))
+
+The `any` class, defined with `$_ = ...`, is used for random word generation.
 
 Example:
 
@@ -268,7 +269,7 @@ Reasons are used before [_rules_](#rules) as an explanation if a test fails.
 Syntax:
 
 - `@` Commat
-- _Optional_ `*` Star - Use as a note as well
+- _Optional_ `*` Star - Use as a note as well (a _noted_ reason)
 - Text to define reason as (And print, if being used as note)
 
 Example:
@@ -314,6 +315,39 @@ See the [examples](./examples/) folder for `phoner` file examples.
 
 - [Toki Pona](./examples/tokipona.phoner)
 - [Ivalingo](./examples/ivalingo.phoner)
+
+## Recommended Syntax Patterns
+
+These formatting tips are not required, but recommended to make the file easier to read.
+
+1. Define all rules at the top of the file
+   - Also define an `any` class, for word generation
+2. Group related rules and tests, using a noted reason
+   - Define rules first, then positive tests, then negative tests
+3. Indent rules and tests under notes or reasons
+   - Rules should use 1 intent, tests use 2
+
+Eg.
+
+```phoner
+$_ = [ptkmnswjlaeiou]
+$C = [ptkmnswjl]
+$V = [aeiou]
+
+@* Invalid letters
+  + ^ <_>+ $
+    ?+ taso
+    ?! tyxo
+
+@* Syllable structure
+  + ^ ( <C> <V> ) $
+    ?+ taso kili
+    ?! ano taaso
+
+* Some more tests
+  ?+ silo tila
+  ?! aka axe
+```
 
 # TODO
 

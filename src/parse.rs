@@ -98,17 +98,17 @@ impl Phoner {
 
               // Get name
               let name = match split.next() {
-                Some(x) => x.trim(),
+                Some(x) => x.trim().to_string(),
                 None => return Err(Error::NoClassName { line: line_num + 1 }),
               };
 
               // Check if name is valid
               if !class_name_pattern
-                .is_match(name)
+                .is_match(&name)
                 .expect("Failed checking regex match. This error should NEVER APPEAR!")
               {
                 return Err(Error::InvalidClassName {
-                  name: name.to_string(),
+                  name,
                   line: line_num + 1,
                 });
               }
@@ -116,8 +116,21 @@ impl Phoner {
               // Get value
               let value = match split.next() {
                 Some(x) => x.trim(),
-                None => return Err(Error::NoClassValue { line: line_num + 1 }),
+                None => {
+                  return Err(Error::NoClassValue {
+                    name,
+                    line: line_num + 1,
+                  })
+                }
               };
+
+              // Check that class does not already exist
+              if classes.get(&name).is_some() {
+                return Err(Error::ClassAlreadyExist {
+                  name,
+                  line: line_num + 1,
+                });
+              }
 
               // Insert class
               classes.insert(name.to_string(), value.to_string());
@@ -229,8 +242,9 @@ impl Phoner {
     }
 
     //TODO MAKE THIS BETTER
+    //TODO Add line number
     let mut new_classes = Classes::new();
-    for (k, v) in &classes{ 
+    for (k, v) in &classes {
       new_classes.insert(k.to_string(), substitute_classes(v, &classes, 0)?);
     }
     let classes = new_classes;
@@ -304,11 +318,7 @@ fn make_regex(raw_rules: Vec<RawRule>, classes: &Classes) -> Result<Vec<Rule>, E
 }
 
 /// Substitute class names regex rule with class values (recursively)
-fn substitute_classes(
-  pattern: &str,
-  classes: &Classes,
-  line_num: usize,
-) -> Result<String, Error> {
+fn substitute_classes(pattern: &str, classes: &Classes, line_num: usize) -> Result<String, Error> {
   let mut output = String::new();
   let mut name_build: Option<String> = None;
 
