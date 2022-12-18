@@ -126,11 +126,14 @@ impl Phoner {
                 return Err(Error::ClassAlreadyExist { name, line });
               }
 
-              // Insert class
-              raw_classes.insert(name.to_string(), value.to_string());
+              // Wrap value in brackets (just in case)
+              let value = format!("({})", value);
 
               // Add raw line
               mini.classes.push(format!("${}={}", name, value));
+
+              // Insert class
+              raw_classes.insert(name.to_string(), value);
             }
 
             // Rule

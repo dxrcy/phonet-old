@@ -1,5 +1,5 @@
 $V = [iueoa]
-$C = [pbtdkgmnfvszcwjl]
+$C = [pbtdkgmnfvszcwjl]|sh
 # any character
 $_ = [<V><C>]
 
@@ -24,7 +24,7 @@ $N = [mn]
     ?+ pono
     ? + stononononononononononononononon
     ? +slono ; ? + sonto
-    ?+ ato
+    ?+ ato osho
 
   # aowidj
 
