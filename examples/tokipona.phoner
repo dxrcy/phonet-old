@@ -3,7 +3,7 @@ $V = [iueoa]
 $_ = [<C><V>]
 
 @* Invalid letters
-  + ^ [<C><V>]+ $
+  + ^ <_>+ $
     ?+ alo aso
     ?! axa ado
 
