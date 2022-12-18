@@ -116,22 +116,13 @@ impl PhonerResults {
     let max_word_len = self.max_word_len(display_level);
 
     // Loop result list
-    let mut is_first_print = true;
     for item in &self.list {
       match item {
         // Display note
         TestResult::Note(note) => match display_level {
-          // Always show
-          ShowAll | NotesAndFails => {
-            // Blank line for first print
-            if is_first_print {
-              println!();
-              is_first_print = false;
-            }
+          // Always show - Print note
+          ShowAll | NotesAndFails => println!("\x1b[34m{note}\x1b[0m"),
 
-            // Print note
-            println!("\x1b[34m{note}\x1b[0m")
-          }
           // Else skip
           _ => (),
         },
@@ -163,12 +154,6 @@ impl PhonerResults {
             Custom(reason) => reason,
           };
 
-          // Blank line for first print
-          if is_first_print {
-            println!();
-            is_first_print = false;
-          }
-
           // Display test status
           println!(
             "  \x1b[{intent}\x1b[0m {word}{space}  \x1b[1;{result} \x1b[0;3;1m{reason}\x1b[0m",
@@ -178,11 +163,6 @@ impl PhonerResults {
           );
         }
       }
-    }
-
-    // Blank line if there was tests or notes displayed
-    if !is_first_print {
-      println!();
     }
 
     // Final print
