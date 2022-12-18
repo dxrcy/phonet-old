@@ -349,6 +349,8 @@ $V = [aeiou]
     ?! aka axe
 ```
 
+![Phoner Icon](./icon.png)
+
 # TODO
 
 - Add line number traceback to initial class substitution error
