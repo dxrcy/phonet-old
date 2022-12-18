@@ -108,12 +108,9 @@ impl PhonerResults {
   pub fn display(&self, display_level: DisplayLevel) {
     // No tests
     if self.list.is_empty() {
-      println!("\x1b[33mNo tests to run.\x1b[0m");
+      println!("\x1b[33mNo tests ran.\x1b[0m");
       return;
     }
-
-    // Header
-    println!("\x1b[3;33mRunning {} tests...\x1b[0m", self.list.len());
 
     // Get maximum length of all test words
     let max_word_len = self.max_word_len(display_level);

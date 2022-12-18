@@ -37,6 +37,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
   }
 
   // Run tests and display
+  if !scheme.tests.is_empty() {
+    println!("\x1b[3;33mRunning {} tests...\x1b[0m", scheme.tests.len());
+  }
   scheme.run().display(args.display_level);
 
   // Generate and display random words, if CLI arg given
