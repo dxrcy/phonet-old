@@ -357,3 +357,5 @@ $V = [aeiou]
 - Add more info to `Error` variants
 - Refactor modules (without breaking api?)
 - Remove unnecessary `clone`s where possible
+
+- Move `gen.rs` functionality to `gen` feature
