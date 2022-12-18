@@ -116,7 +116,7 @@ impl Phoner {
             '#' => continue,
 
             // Mode
-            '%' => {
+            '~' => {
               if mode.is_some() {
                 return Err(Error::ModeAlreadyDefined { line });
               }

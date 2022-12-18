@@ -183,6 +183,7 @@ Each statement must begin with an operator:
 - `@` Commat: Define a [_reason_](#reasons) if a test fails
 - `?` Question: Create a [_test_](#tests)
 - `*` Star: Create a test [_note_](#notes) (also with `@*`)
+- `~` Tilde: Define the [_mode_](#mode) of the file
 
 ## Classes
 
@@ -311,6 +312,33 @@ Example (with predefined rules):
 ?! tatso
 ```
 
+## Mode
+
+The mode of a Phoner file can be one of these:
+
+- Romanized: Using `<>`
+- Broad transcription: Using `//`
+- Narrow transcription: Using `[]`
+
+This can optionally be specified in a file, although it does not add any functionality.
+
+Syntax:
+
+- `~` Tilde
+- `<.>`, `/./`, or `[.]` - Mode identifier, with `.` being any string, or blank
+
+Examples:
+
+```phoner
+# Specify romanized mode (fish icon)
+~<>
+```
+
+```phoner
+# Specify broad transcription
+~ / this is the mode /
+```
+
 ## Examples
 
 See the [examples](./examples/) folder for `phoner` file examples.
@@ -322,11 +350,13 @@ See the [examples](./examples/) folder for `phoner` file examples.
 
 These formatting tips are not required, but recommended to make the file easier to read.
 
-1. Define all rules at the top of the file
-   - Also define an `any` class, for word generation
-2. Group related rules and tests, using a noted reason
+  
+1. Specify the mode at the very top of the file
+2. Define all classes at the top of the file
+   - Also define an `any` class first, for word generation
+3. Group related rules and tests, using a noted reason
    - Define rules first, then positive tests, then negative tests
-3. Indent rules and tests under notes or reasons
+4. Indent rules and tests under notes or reasons
    - Rules should use 1 intent, tests use 2
 
 Eg.
