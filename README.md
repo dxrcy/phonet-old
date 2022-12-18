@@ -345,8 +345,8 @@ $V = [aeiou]
     ?! ano taaso
 
 * Some more tests
-  ?+ silo tila
-  ?! aka axe
+    ?+ silo tila
+    ?! aka axe
 ```
 
 # TODO
