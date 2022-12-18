@@ -33,6 +33,8 @@ pub struct Args {
   pub minify: Option<Option<WithTests>>,
 
   /// Generate random words
+  /// 
+  /// Default count 1, specify with number
   #[arg(short, long)]
   pub generate: Option<Option<usize>>,
 }

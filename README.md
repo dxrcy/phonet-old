@@ -48,6 +48,11 @@ Options:
         - just-fails:      Show only fails, not passes or notes
         - hide-all:        Show nothing: not passes, notes, or fails
 
+  -g, --generate [<GENERATE>]
+      Generate random words
+
+      Default count 1, specify with number
+
   -m, --minify [<MINIFY>]
       Minify file and save
 
@@ -81,6 +86,12 @@ phoner -m
 
 # Runs ./myfile.phoner, without outputting any results, and minifies to ./myfile.min.phoner with tests
 phoner -f myfile.phoner -dh -mt
+
+# Runs ./phoner, and generates 1 random word
+phoner -g
+
+# Runs ./myfile.phoner, and generates 10 random words
+phoner -g10
 ```
 
 ### Create Alias / Path
@@ -144,6 +155,10 @@ fn main() {
 
   // Display results - This could be manually implemented
   results.display(DisplayLevel::ShowAll);
+
+  // Generate random words
+  let words = scheme.generate(10, 3..14).unwrap();
+  println!("{words:?}");
 }
 ```
 
@@ -304,6 +319,6 @@ See the [examples](./examples/) folder for `phoner` file examples.
 
 - Add more docs
 - Add tests !
-- Add more info to `ParseError` variants
+- Add more info to `Error` variants
 - Refactor modules (without breaking api?)
 - Remove unnecessary `clone`s where possible
