@@ -351,6 +351,7 @@ $V = [aeiou]
 
 # TODO
 
+- Add line number traceback to initial class substitution error
 - Add more docs
 - Add tests !
 - Add more info to `Error` variants
