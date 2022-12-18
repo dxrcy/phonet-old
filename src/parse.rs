@@ -306,13 +306,19 @@ fn make_regex(raw_rules: Vec<RawRule>, classes: &Classes) -> Result<Vec<Rule>, E
 /// Substitute class names regex rule with class values (recursively)
 fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<String, Error> {
   let mut output = String::new();
+
+  // Build class name
   let mut name_build: Option<String> = None;
+
+  // All previously checked characters in string (for check for lookbehind)
+  let mut prev = String::new();
 
   // Loop characters
   for ch in pattern.chars() {
     match ch {
       // Open class name
-      '<' => {
+      // Check that not in lookbehind
+      '<' if !prev.ends_with("(?") => {
         if name_build.is_some() {
           // Name is already building - Another opening bracket should not be there
           return Err(Error::ClassUnexpectedOpenName {
@@ -359,6 +365,8 @@ fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<S
 
       // Normal character
       _ => {
+        prev.push(ch);
+
         if let Some(name) = &mut name_build {
           // Name is building - push to name
           name.push(ch);

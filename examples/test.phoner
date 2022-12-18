@@ -72,3 +72,6 @@ $N = [mn]
 
 ? + telo tenlo
 ? ! telno
+
+# using lookbehind - should not register as class
+! (?<=x)
