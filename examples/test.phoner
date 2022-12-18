@@ -74,4 +74,8 @@ $N = [mn]
 ? ! telno
 
 # using lookbehind - should not register as class
-! (?<=x)
+! (?<=<V>)
+
+@* Invalid seq. consonants
+  $CC = nt | sl | ls
+  ! <C>{2} (?<= <CC> )

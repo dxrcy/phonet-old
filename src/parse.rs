@@ -127,7 +127,7 @@ impl Phoner {
               }
 
               // Wrap value in brackets (just in case)
-              let value = format!("({})", value);
+              let value = format!("({})", value.replace(' ', ""));
 
               // Add raw line
               mini.classes.push(format!("${}={}", name, value));
