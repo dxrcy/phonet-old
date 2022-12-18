@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use fancy_regex::Regex;
 
 use crate::{
@@ -13,7 +15,7 @@ struct RawRule {
   pub intent: bool,
   pub pattern: String,
   pub reason_ref: Option<usize>,
-  pub line_num: usize,
+  pub line: usize,
 }
 
 /// Holds data for minify
@@ -62,7 +64,7 @@ impl Phoner {
   /// Parse `Phoner` from string
   pub fn parse(file: &str) -> Result<Phoner, Error> {
     // Builders
-    let mut classes: Classes = Classes::new();
+    let mut raw_classes: Classes = HashMap::new();
     let mut tests: Vec<TestDefinition> = Vec::new();
     let mut rules: Vec<RawRule> = Vec::new();
 
@@ -75,17 +77,20 @@ impl Phoner {
     let class_name_pattern = Regex::new(r"^\w+$").expect("Could not parse static regex");
 
     // Split at line
-    for (line_num, line) in file.lines().enumerate() {
+    for (line, line_statements) in file.lines().enumerate() {
+      // Line number (as in file)
+      let line = line + 1;
+
       // Split line at semicolon
-      for line in line.split(';') {
-        let line = line.trim();
+      for statement in line_statements.split(';') {
+        let statement = statement.trim();
 
         // Continue for blank
-        if line.is_empty() {
+        if statement.is_empty() {
           continue;
         }
 
-        let mut chars = line.chars();
+        let mut chars = statement.chars();
 
         if let Some(first) = chars.next() {
           match first {
@@ -99,7 +104,7 @@ impl Phoner {
               // Get name
               let name = match split.next() {
                 Some(x) => x.trim().to_string(),
-                None => return Err(Error::NoClassName { line: line_num + 1 }),
+                None => return Err(Error::NoClassName { line }),
               };
 
               // Check if name is valid
@@ -107,33 +112,22 @@ impl Phoner {
                 .is_match(&name)
                 .expect("Failed checking regex match. This error should NEVER APPEAR!")
               {
-                return Err(Error::InvalidClassName {
-                  name,
-                  line: line_num + 1,
-                });
+                return Err(Error::InvalidClassName { name, line });
               }
 
               // Get value
               let value = match split.next() {
                 Some(x) => x.trim(),
-                None => {
-                  return Err(Error::NoClassValue {
-                    name,
-                    line: line_num + 1,
-                  })
-                }
+                None => return Err(Error::NoClassValue { name, line }),
               };
 
               // Check that class does not already exist
-              if classes.get(&name).is_some() {
-                return Err(Error::ClassAlreadyExist {
-                  name,
-                  line: line_num + 1,
-                });
+              if raw_classes.get(&name).is_some() {
+                return Err(Error::ClassAlreadyExist { name, line });
               }
 
               // Insert class
-              classes.insert(name.to_string(), value.to_string());
+              raw_classes.insert(name.to_string(), value.to_string());
 
               // Add raw line
               mini.classes.push(format!("${}={}", name, value));
@@ -154,7 +148,7 @@ impl Phoner {
                 intent,
                 pattern,
                 reason_ref,
-                line_num,
+                line,
               });
             }
 
@@ -175,10 +169,7 @@ impl Phoner {
 
                 // Unknown character
                 Some(ch) => {
-                  return Err(UnknownIntentIdentifier {
-                    ch,
-                    line: line_num + 1,
-                  });
+                  return Err(UnknownIntentIdentifier { ch, line });
                 }
                 // No character
                 None => continue,
@@ -230,24 +221,21 @@ impl Phoner {
             }
 
             // Unknown
-            _ => {
-              return Err(UnknownLineOperator {
-                ch: first,
-                line: line_num + 1,
-              })
-            }
+            _ => return Err(UnknownLineOperator { ch: first, line }),
           }
         }
       }
     }
 
-    //TODO MAKE THIS BETTER
     //TODO Add line number
-    let mut new_classes = Classes::new();
-    for (k, v) in &classes {
-      new_classes.insert(k.to_string(), substitute_classes(v, &classes, 0)?);
+    let mut classes = Classes::new();
+    for (name, value) in &raw_classes {
+      classes.insert(
+        name.to_string(),
+        substitute_classes(value, &raw_classes, 0)?,
+      );
     }
-    let classes = new_classes;
+    let classes = classes;
 
     // Convert rules to regex rules
     let rules = make_regex(rules, &classes)?;
@@ -294,17 +282,12 @@ fn make_regex(raw_rules: Vec<RawRule>, classes: &Classes) -> Result<Vec<Rule>, E
     intent,
     pattern,
     reason_ref,
-    line_num,
+    line,
   } in raw_rules
   {
-    let pattern = match Regex::new(&substitute_classes(&pattern, classes, line_num)?) {
+    let pattern = match Regex::new(&substitute_classes(&pattern, classes, line)?) {
       Ok(x) => x,
-      Err(err) => {
-        return Err(RegexFail {
-          err,
-          line: line_num + 1,
-        })
-      }
+      Err(err) => return Err(RegexFail { err, line }),
     };
 
     rules.push(Rule {
@@ -318,7 +301,7 @@ fn make_regex(raw_rules: Vec<RawRule>, classes: &Classes) -> Result<Vec<Rule>, E
 }
 
 /// Substitute class names regex rule with class values (recursively)
-fn substitute_classes(pattern: &str, classes: &Classes, line_num: usize) -> Result<String, Error> {
+fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<String, Error> {
   let mut output = String::new();
   let mut name_build: Option<String> = None;
 
@@ -331,7 +314,7 @@ fn substitute_classes(pattern: &str, classes: &Classes, line_num: usize) -> Resu
           // Name is already building - Another opening bracket should not be there
           return Err(Error::ClassUnexpectedOpenName {
             pattern: pattern.to_string(),
-            line: line_num,
+            line,
           });
         }
 
@@ -348,7 +331,7 @@ fn substitute_classes(pattern: &str, classes: &Classes, line_num: usize) -> Resu
             // No name is building - Closing bracket should not be there
             return Err(Error::ClassUnexpectedCloseName {
               pattern: pattern.to_string(),
-              line: line_num,
+              line,
             });
           }
         };
@@ -360,13 +343,13 @@ fn substitute_classes(pattern: &str, classes: &Classes, line_num: usize) -> Resu
             // Class name was not found
             return Err(Error::ClassNotFound {
               name: name.to_string(),
-              line: line_num,
+              line,
             });
           }
         };
 
         // Add value to output (recursively)
-        output.push_str(&substitute_classes(value, classes, line_num)?);
+        output.push_str(&substitute_classes(value, classes, line)?);
         // Finish building name
         name_build = None;
       }
@@ -388,7 +371,7 @@ fn substitute_classes(pattern: &str, classes: &Classes, line_num: usize) -> Resu
   if name_build.is_some() {
     return Err(Error::ClassUnexpectedEnd {
       pattern: pattern.to_string(),
-      line: line_num,
+      line,
     });
   }
 
