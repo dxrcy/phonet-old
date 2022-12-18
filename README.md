@@ -123,7 +123,7 @@ Add `phoner = "0.5.3"` to your `Crates.toml` file
 
 Short example:
 
-```rs
+```rust
 use phoner::Phoner;
 
 fn main() {
@@ -140,7 +140,7 @@ fn main() {
 
 Long example:
 
-```rs
+```rust
 use phoner::{Phoner, DisplayLevel};
 
 fn main() {
