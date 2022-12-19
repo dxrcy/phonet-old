@@ -159,11 +159,11 @@ impl PhonerResults {
           // Format reason
           let reason = match &reason {
             Passed => "",
-            ShouldNotHaveMatched => {
+            ShouldBeInvalid => {
               if no_color {
-                "Matched, but should have not"
+                "Valid, but should be invalid"
               } else {
-                "\x1b[33mMatched, but should have not\x1b[0m"
+                "\x1b[33mValid, but should be invalid\x1b[0m"
               }
             }
             NoReasonGiven => "No reason given",
@@ -223,8 +223,8 @@ pub enum Reason {
   Passed,
   /// No reason was given for rule for test failing
   NoReasonGiven,
-  /// Test matched, but should have not
-  ShouldNotHaveMatched,
+  /// Test was valid, but should have been invalid
+  ShouldBeInvalid,
   /// Custom reason for rule
   Custom(String),
 }
@@ -232,10 +232,10 @@ pub enum Reason {
 impl Reason {
   fn from(validity: ValidStatus, reasons: &[String]) -> Self {
     match validity {
-      // Test was valid, but it should have not matched
-      Valid => ShouldNotHaveMatched,
+      // Test was valid, but it should have been invalid 
+      Valid => ShouldBeInvalid,
 
-      // Test was invalid, but it should have matched
+      // Test was invalid, but it should have been valid
       Invalid(reason) => match reason {
         // No reason was given for rule
         None => NoReasonGiven,
