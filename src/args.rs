@@ -37,6 +37,12 @@ pub struct Args {
   /// Default count 1, specify with number
   #[arg(short, long)]
   pub generate: Option<Option<usize>>,
+
+  /// Display output in default color
+  /// 
+  /// Use for piping standard output to a file
+  #[arg(short, long)]
+  pub no_color: bool,
 }
 
 #[derive(Clone, Copy, Debug)]

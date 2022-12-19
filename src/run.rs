@@ -105,10 +105,14 @@ impl PhonerResults {
   /// Display results to standard output
   ///
   /// This can be implemented manually
-  pub fn display(&self, display_level: DisplayLevel) {
+  pub fn display(&self, display_level: DisplayLevel, no_color: bool) {
     // No tests
     if self.list.is_empty() {
-      println!("\x1b[33mNo tests ran.\x1b[0m");
+      if no_color {
+        println!("No tests ran.");
+      } else {
+        println!("\x1b[33mNo tests ran.\x1b[0m");
+      }
       return;
     }
 
@@ -121,7 +125,13 @@ impl PhonerResults {
         // Display note
         TestResult::Note(note) => match display_level {
           // Always show - Print note
-          ShowAll | NotesAndFails => println!("\x1b[34m{note}\x1b[0m"),
+          ShowAll | NotesAndFails => {
+            if no_color {
+              println!("{note}")
+            } else {
+              println!("\x1b[34m{note}\x1b[0m")
+            }
+          }
 
           // Else skip
           _ => (),
@@ -149,18 +159,33 @@ impl PhonerResults {
           // Format reason
           let reason = match &reason {
             Passed => "",
-            ShouldNotHaveMatched => "\x1b[33mMatched, but should have not\x1b[0m",
+            ShouldNotHaveMatched => {
+              if no_color {
+                "Matched, but should have not"
+              } else {
+                "\x1b[33mMatched, but should have not\x1b[0m"
+              }
+            }
             NoReasonGiven => "No reason given",
             Custom(reason) => reason,
           };
 
           // Display test status
-          println!(
-            "  \x1b[{intent}\x1b[0m {word}{space}  \x1b[1;{result} \x1b[0;3;1m{reason}\x1b[0m",
-            intent = if *intent { "36m✔" } else { "35m✗" },
-            space = " ".repeat(max_word_len - word.chars().count()),
-            result = if *pass { "32mpass" } else { "31mFAIL" },
-          );
+          if no_color {
+            println!(
+              " {intent} {word}{space}  {result} {reason}",
+              intent = if *intent { "✔" } else { "✗" },
+              space = " ".repeat(max_word_len - word.chars().count()),
+              result = if *pass { "pass" } else { "FAIL" },
+            );
+          } else {
+            println!(
+              "  \x1b[{intent}\x1b[0m {word}{space}  \x1b[1;{result} \x1b[0;3;1m{reason}\x1b[0m",
+              intent = if *intent { "36m✔" } else { "35m✗" },
+              space = " ".repeat(max_word_len - word.chars().count()),
+              result = if *pass { "32mpass" } else { "31mFAIL" },
+            );
+          }
         }
       }
     }
@@ -168,14 +193,26 @@ impl PhonerResults {
     // Final print
     if self.fail_count == 0 {
       // All passed
-      println!("\x1b[32;1;3mAll tests pass!\x1b[0m");
+      if no_color {
+        println!("All tests pass!");
+      } else {
+        println!("\x1b[32;1;3mAll tests pass!\x1b[0m");
+      }
     } else {
       // Some failed
-      println!(
-        "\x1b[31;1;3m{fails} test{s} failed!\x1b[0m",
-        fails = self.fail_count,
-        s = if self.fail_count == 1 { "" } else { "s" },
-      );
+      if no_color {
+        println!(
+          "{fails} test{s} failed!",
+          fails = self.fail_count,
+          s = if self.fail_count == 1 { "" } else { "s" },
+        );
+      } else {
+        println!(
+          "\x1b[31;1;3m{fails} test{s} failed!\x1b[0m",
+          fails = self.fail_count,
+          s = if self.fail_count == 1 { "" } else { "s" },
+        );
+      }
     }
   }
 }

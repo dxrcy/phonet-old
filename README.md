@@ -57,6 +57,11 @@ Options:
 
       Possible values:
         - tests: Include tests
+        
+  -n, --no-color
+      Display output in default color
+
+      Use for piping standard output to a file
 
   -h, --help
       Print help information (use `-h` for a summary)

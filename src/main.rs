@@ -38,9 +38,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
   // Run tests and display
   if !scheme.tests.is_empty() {
-    println!("\x1b[3;33mRunning {} tests...\x1b[0m", scheme.tests.len());
+    if args.no_color {
+      println!("Running {} tests...", scheme.tests.len());
+    } else {
+      println!("\x1b[3;33mRunning {} tests...\x1b[0m", scheme.tests.len());
+    }
   }
-  scheme.run().display(args.display_level);
+  scheme.run().display(args.display_level, args.no_color);
 
   // Generate and display random words, if CLI arg given
   if let Some(count) = args.generate {
@@ -51,10 +55,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let length = 3..14;
 
     if count > 0 {
-      println!(
-        "\x1b[34mRandomly generated word{s}:\x1b[0m",
-        s = if count == 1 { "" } else { "s" }
-      );
+      if args.no_color {
+        println!(
+          "Randomly generated word{s}:",
+          s = if count == 1 { "" } else { "s" }
+        );
+      } else {
+        println!(
+          "\x1b[34mRandomly generated word{s}:\x1b[0m",
+          s = if count == 1 { "" } else { "s" }
+        );
+      }
 
       // Generate words
       let words = scheme
@@ -64,7 +75,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
       // Print words
       for word in words {
-        println!(" \x1b[36m- \x1b[0;3m{}\x1b[0m", word);
+        if args.no_color {
+          println!(" - {}", word);
+        } else {
+          println!(" \x1b[36m- \x1b[0;3m{}\x1b[0m", word);
+        }
       }
     }
   }
