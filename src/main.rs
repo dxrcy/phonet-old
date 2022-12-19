@@ -51,8 +51,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let count = count.unwrap_or(1);
 
     // Min and max length
-    // This can be specified in a rule, Eg. `+^.{6,8}$` - only length 6..8
-    let length = 3..14;
+    let length = args.generate_min_len.unwrap_or(3)..args.generate_max_len.unwrap_or(14);
 
     if count > 0 {
       if args.no_color {

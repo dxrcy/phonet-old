@@ -47,16 +47,28 @@ Options:
         - just-fails:      Show only fails, not passes or notes
         - hide-all:        Show nothing: not passes, notes, or fails
 
-  -g, --generate [<GENERATE>]
-      Generate random words
-
-      Default count 1, specify with number
-
   -m, --minify [<MINIFY>]
       Minify file and save
 
       Possible values:
         - tests: Include tests
+
+  -g, --generate [<GENERATE>]
+      Generate random words
+
+      Default count 1, specify with number
+
+      --gmin <GENERATE_MIN_LEN>
+          Set minimum length for generated words
+
+          Use with the `--generate` or `-g` flag
+
+          Note: This increases generation time exponentially
+
+      --gmax <GENERATE_MAX_LEN>
+          Set maximum length for generated words
+
+          Use with the `--generate` or `-g` flag
 
   -n, --no-color
       Display output in default color
@@ -99,6 +111,9 @@ phoner -g10 -g myfile.phoner
 
 # Runs ./phoner, with no color, and writes output to ./phoner.txt
 phoner -n > phoner.txt
+
+# Runs ./myfile.phoner, with all test output hidden, and generates 3 random words with length 6-8, writes output to ./phoner.txt (with no color)
+phoner -f myfile.phoner -nd h -g 3 --gmin 6 --gmax 8 > ./phoner.txt
 ```
 
 ### Create Alias / Path

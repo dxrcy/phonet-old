@@ -33,13 +33,27 @@ pub struct Args {
   pub minify: Option<Option<WithTests>>,
 
   /// Generate random words
-  /// 
+  ///
   /// Default count 1, specify with number
   #[arg(short, long)]
   pub generate: Option<Option<usize>>,
 
+  /// Set minimum length for generated words
+  ///
+  /// Use with the `--generate` or `-g` flag
+  ///
+  /// Note: This increases generation time exponentially
+  #[arg(long = "gmin")]
+  pub generate_min_len: Option<usize>,
+
+  /// Set maximum length for generated words
+  ///
+  /// Use with the `--generate` or `-g` flag
+  #[arg(long = "gmax")]
+  pub generate_max_len: Option<usize>,
+
   /// Display output in default color
-  /// 
+  ///
   /// Use for piping standard output to a file
   #[arg(short, long)]
   pub no_color: bool,
