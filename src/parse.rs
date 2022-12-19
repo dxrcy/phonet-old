@@ -167,8 +167,10 @@ impl Phoner {
                 return Err(Error::ClassAlreadyExist { name, line });
               }
 
-              // Wrap value in brackets (just in case)
-              let value = format!("({})", value.replace(' ', ""));
+              // Wrap value in NON-CAPTURING GROUP (just in case)
+              // This is non-capturing, for classes to work with back-references
+              // otherwise classes would be inherently capturing, and count towards group index in back-reference
+              let value = format!("(?:{})", value.replace(' ', ""));
 
               // Add raw line
               mini.classes.push(format!("${}={}", name, value));

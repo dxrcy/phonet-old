@@ -45,7 +45,7 @@ $N = [mn]
 ? ! taata
 
 @ More than 2 seq. consonants
-  ! <C> {3}
+  ! <C> ^[^a]
 
     ? + apa
     ? ! aspla assa asssa
