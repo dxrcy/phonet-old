@@ -1,6 +1,6 @@
 [package]
 name = "phoner"
-version = "0.6.3"
+version = "0.6.4"
 edition = "2021"
 description = "A CLI tool and library to validate phonotactic patterns for constructed languages"
 license = "MIT"
