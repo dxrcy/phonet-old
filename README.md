@@ -95,7 +95,10 @@ phoner -f myfile.phoner -dh -mt
 phoner -g
 
 # Runs ./myfile.phoner, and generates 10 random words
-phoner -g10
+phoner -g10 -g myfile.phoner
+
+# Runs ./phoner, with no color, and writes output to ./phoner.txt
+phoner -n > phoner.txt
 ```
 
 ### Create Alias / Path
@@ -158,7 +161,7 @@ fn main() {
   let results = scheme.run(scheme);
 
   // Display results - This could be manually implemented
-  results.display(DisplayLevel::ShowAll);
+  results.display(DisplayLevel::ShowAll, false);
 
   // Generate random words
   let words = scheme.generate(10, 3..14).unwrap();
