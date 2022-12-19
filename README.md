@@ -57,7 +57,7 @@ Options:
 
       Possible values:
         - tests: Include tests
-        
+
   -n, --no-color
       Display output in default color
 
@@ -179,13 +179,15 @@ A `phoner` file is used to define the rules, classes, and tests for the program.
 
 The syntax is a statements, each separated by a semicolon `;` or a linebreak.
 
+Comments will only end with a linebreak.
+
 All whitespace is ignored, except to separate words in [_tests_](#tests).
 
 > Note! This will replace spaces in Regex as well!
 
 Each statement must begin with an operator:
 
-- `#` Hashtag: A whole line comment. A semicolon ends the comment
+- `#` Hashtag: A whole line comment. A linebreak (not a semicolon) ends the comment
 - `$` Dollar: Define a [_class_](#classes)
 - `+` **Plus** or `!` **Bang**: Define a [_rule_](#rule)
 - `@` Commat: Define a [_reason_](#reasons) if a test fails
@@ -358,7 +360,6 @@ See the [examples](./examples/) folder for `phoner` file examples.
 
 These formatting tips are not required, but recommended to make the file easier to read.
 
-  
 1. Specify the mode at the very top of the file
 2. Define all classes at the top of the file
    - Also define an `any` class first, for word generation

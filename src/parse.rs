@@ -99,6 +99,11 @@ impl Phoner {
       // Line number (as in file)
       let line = line + 1;
 
+      // Comment
+      if line_statements.trim().starts_with('#') {
+        continue;
+      }
+
       // Split line at semicolon
       for statement in line_statements.split(';') {
         let statement = statement.trim();
