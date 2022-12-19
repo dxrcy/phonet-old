@@ -124,7 +124,7 @@ $env:Path = "$env:Path;<path_to_file>\phoner.exe"
 
 ## Library use
 
-Add `phoner = "0.6.3"` to your `Crates.toml` file
+Add `phoner = "0.6.4"` to your `Crates.toml` file
 
 - [Docs.rs](https://docs.rs/phoner/latest/phoner)
 - [Crates.io](https://crates.io/crates/phoner)
