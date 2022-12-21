@@ -1,6 +1,6 @@
 # Phoner
 
-Phoner is a CLI tool and library to validate phonotactic patterns for constructed languages.
+_Phoner_ is a CLI tool and library to validate phonotactic patterns for constructed languages.
 It is compatible with either romanization and phonetic transcription.
 Words can be randomly generated (see [Argument Syntax](#argument-syntax)).
 
@@ -139,7 +139,7 @@ $env:Path = "$env:Path;<path_to_file>\phoner.exe"
 
 ## Library use
 
-Add `phoner = "0.6.4"` to your `Crates.toml` file
+Add `phoner = "0.7.0"` to your `Crates.toml` file
 
 - [Docs.rs](https://docs.rs/phoner/latest/phoner)
 - [Crates.io](https://crates.io/crates/phoner)
@@ -186,7 +186,9 @@ fn main() {
 
 # File syntax
 
-A `phoner` file is used to define the rules, classes, and tests for the program.
+A _Phoner_ file is used to define the rules, classes, and tests for the program.
+
+The file should either be called `phoner`, or end in `.phoner`
 
 [Syntax Highlighting Extension for VSCode](https://github.com/darccyy/phoner-syntax)
 
@@ -202,28 +204,36 @@ All whitespace is ignored, except to separate words in [_tests_](#tests).
 
 Each statement must begin with an operator:
 
-- `#` Hashtag: A whole line comment. A linebreak (not a semicolon) ends the comment
-- `$` Dollar: Define a [_class_](#classes)
-- `+` **Plus** or `!` **Bang**: Define a [_rule_](#rule)
-- `@` Commat: Define a [_reason_](#reasons) if a test fails
-- `?` Question: Create a [_test_](#tests)
-- `*` Star: Create a test [_note_](#notes) (also with `@*`)
-- `~` Tilde: Define the [_mode_](#mode) of the file
+- `#` _Hashtag_: A whole line comment. A linebreak (not a semicolon) ends the comment
+- `$` _Dollar_: Define a [_class_](#classes)
+- `+` **_Plus_** or `!` **_Bang_**: Define a [_rule_](#rule)
+- `@` _Commat_: Define a [_reason_](#reasons) if a test fails
+- `?` _Question_: Create a [_test_](#tests)
+- `*` _Star_: Create a test [_note_](#notes) (also with `@*`)
+- `~` _Tilde_: Define the [_mode_](#mode) of the file
 
 ## Classes
 
 Classes are used as shorthand Regular Expressions, substituted into [_rules_](#rules) at runtime.
 
-Syntax:
+> **Note:** Angle brackets will not parse as class names directly after:
+>
+> - An opening round bracket and a question mark: `(?`
+> - An opening round bracket, question mark, and letter 'P': `(?P`
+> - A backslash and letter 'k': `\k`
+>
+> This is the syntax used for look-behinds and named groups
 
-- `$` Dollar
+_Syntax:_
+
+- `$` _Dollar_
 - Name - Must be only characters from [a-zA-Z0-9_]
-- `=` Equals
+- `=` _Equals_
 - Value - Regular Expression, may contain other _classes_ in angle brackets `<>` (as with [_rules_](#rules))
 
 The `any` class, defined with `$_ = ...`, is used for random word generation.
 
-Example:
+_Example:_
 
 ```phoner
 # Some consonants
@@ -247,12 +257,12 @@ Rules are defined with an _intent_, either `+` for _positive_, or `!` for _negat
 
 To use a [_class_](#classes), use the class name, surrounded by angle brackets `<>`.
 
-Syntax:
+_Syntax:_
 
-- `+` Plus or `!` Bang - Plus for _positive_ rule, Bang for _negative_ rule
+- `+` **_Plus_** or `!` **_Bang_** - Plus for _positive_ rule, Bang for _negative_ rule
 - Pattern - Regular Expression, may contain [_classes_](#classes) in angle brackets `<>`
 
-Example (with predefined [_classes_](#classes)):
+_Example (with predefined [*classes*](#classes)):_
 
 ```phoner
 # Must be (C)V syllable structure
@@ -273,13 +283,13 @@ Like [_rules_](#rules), tests must have a defined _intent_, either `+` for _posi
 - A _positive_ test will pass if it is valid
 - A _negative_ test will **fail** if it is valid
 
-Syntax:
+_Syntax:_
 
-- `?` Question mark
-- `+` Plus or `!` Bang - Plus for _positive_ test, Bang for _negative_ test
+- `?` _Question mark_
+- `+` **_Plus_** or `!` **_Bang_** - Plus for _positive_ test, Bang for _negative_ test
 - Tests - A word, or multiple words separated by a space
 
-Example (with predefined [_rules_](#rules)):
+_Example (with predefined [*rules*](#rules)):_
 
 ```phoner
 # This should match, to pass
@@ -294,13 +304,13 @@ Example (with predefined [_rules_](#rules)):
 
 Reasons are used before [_rules_](#rules) as an explanation if a test fails.
 
-Syntax:
+_Syntax:_
 
-- `@` Commat
-- _Optional_ `*` Star - Use as a note as well (a _noted_ reason)
+- `@` _Commat_
+- _Optional_ `*` _Star_ - Use as a note as well (a _noted_ reason)
 - Text to define reason as (And print, if being used as note)
 
-Example:
+_Example:_
 
 ```phoner
 @ Syllable structure
@@ -322,12 +332,12 @@ Notes are printed to the terminal output, alongside tests.
 
 They can be used to separate tests into sections, however this is only cosmetic.
 
-Syntax:
+_Syntax:_
 
-- `*` Star
+- `*` _Star_
 - Text to print to terminal
 
-Example (with predefined rules):
+_Example (with predefined rules):_
 
 ```phoner
 * Should match
@@ -339,20 +349,20 @@ Example (with predefined rules):
 
 ## Mode
 
-The mode of a Phoner file can be one of these:
+The mode of a _Phoner_ file can be one of these:
 
-- Romanized: Using `<>`
-- Broad transcription: Using `//`
-- Narrow transcription: Using `[]`
+- _Romanized_: Using `<>`
+- _Broad transcription_: Using `//`
+- _Narrow transcription_: Using `[]`
 
 This can optionally be specified in a file, although it does not add any functionality.
 
-Syntax:
+_Syntax:_
 
-- `~` Tilde
+- `~` _Tilde_
 - `<.>`, `/./`, or `[.]` - Mode identifier, with `.` being any string, or blank
 
-Examples:
+_Examples:_
 
 ```phoner
 # Specify romanized mode (fish icon)
@@ -366,8 +376,9 @@ Examples:
 
 ## Examples
 
-See the [examples](./examples/) folder for `phoner` file examples.
+See the [examples](./examples/) folder for _Phoner_ file examples.
 
+- [Good Syntax Example](./examples/example.phoner)
 - [Toki Pona](./examples/tokipona.phoner)
 - [Ivalingo](./examples/ivalingo.phoner)
 
@@ -383,26 +394,39 @@ These formatting tips are not required, but recommended to make the file easier 
 4. Indent rules and tests under notes or reasons
    - Rules should use 1 intent, tests use 2
 
-Eg.
+_Example (this is from [example.phoner](./examples/example.phoner)):_
 
 ```phoner
-$_ = [ptkmnswjlaeiou]
-$C = [ptkmnswjl]
-$V = [aeiou]
+~<> ;# Mode (optional) - This file uses romanized letters
 
-@* Invalid letters
-  + ^ <_>+ $
+# Class definitions
+$_ = [ptkmnswjlaeiou] ;# Any / all letters (required for generating words)
+$C = [ptkmnswjl]      ;# Consonants
+$V = [aeiou]          ;# Vowels
+
+@* Invalid letters    ;# Noted reason - Prints like a note to standard output
+  + ^ <_>+ $          ;# Check that every letter is in the 'any' group
     ?+ taso
     ?! tyxo
 
+* Examples of failing tests
+    ?+ tyxo           ;# This test will fail - with the reason 'Invalid Letters' (above)
+    ?! taso           ;# This test will fail, as a false positive
+
 @* Syllable structure
-  + ^ ( <C> <V> ) $
+  + ^ ( <C> <V> )+ $  ;# Check that word is Consonant + Vowel, repeating at least once
     ?+ taso kili
     ?! ano taaso
 
-* Some more tests
+* Some more tests     ;# Note - Prints to standard output
     ?+ silo tila
     ?! aka axe
+
+@* No repeated letters
+  ! (.)\1             ;# This is an unnamed back-reference
+  ! (?<x> .) \k<x>    ;# This is a named back-reference (NOT a class)
+    ?+ taso
+    ?! taaso ttaso
 ```
 
 ![Phoner Icon](./icon.png)

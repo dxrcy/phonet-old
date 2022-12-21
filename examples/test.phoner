@@ -44,6 +44,15 @@ $N = [mn]
 ? ! atta
 ? ! taata
 
+ @ Any repeated letter (w named group)
+# Backreference
+;! (? <a>.) \k <a> {1,}
+;! (? P <a>.) \k <a> {1,}
+
+? + tanta
+? ! atta
+? ! taata
+
 @ More than 2 seq. consonants
   ! <C> ^[^a]
 

@@ -1,0 +1,30 @@
+~<> ;# Mode (optional) - This file uses romanized letters
+
+# Class definitions
+$_ = [ptkmnswjlaeiou] ;# Any / all letters (required for generating words)
+$C = [ptkmnswjl]      ;# Consonants
+$V = [aeiou]          ;# Vowels
+
+@* Invalid letters    ;# Noted reason - Prints like a note to standard output
+  + ^ <_>+ $          ;# Check that every letter is in the 'any' group
+    ?+ taso
+    ?! tyxo
+
+* Examples of failing tests
+    ?+ tyxo           ;# This test will fail - with the reason 'Invalid Letters' (above)
+    ?! taso           ;# This test will fail, as a false positive
+
+@* Syllable structure
+  + ^ ( <C> <V> )+ $  ;# Check that word is Consonant + Vowel, repeating at least once
+    ?+ taso kili
+    ?! ano taaso
+
+* Some more tests     ;# Note - Prints to standard output
+    ?+ silo tila
+    ?! aka axe
+
+@* No repeated letters
+  ! (.)\1             ;# This is an unnamed back-reference
+  ! (?<x> .) \k<x>    ;# This is a named back-reference (NOT a class)
+    ?+ taso
+    ?! taaso ttaso

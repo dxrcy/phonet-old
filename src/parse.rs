@@ -340,7 +340,8 @@ fn make_regex(raw_rules: Vec<RawRule>, classes: &Classes) -> Result<Vec<Rule>, E
     line,
   } in raw_rules
   {
-    let pattern = match Regex::new(&substitute_classes(&pattern, classes, line)?) {
+    let pat = substitute_classes(&pattern, classes, line)?;
+    let pattern = match Regex::new(&pat) {
       Ok(x) => x,
       Err(err) => return Err(RegexFail { err, line }),
     };
@@ -356,21 +357,23 @@ fn make_regex(raw_rules: Vec<RawRule>, classes: &Classes) -> Result<Vec<Rule>, E
 }
 
 /// Substitute class names regex rule with class values (recursively)
+/// 
+/// `pattern` argument must not contain spaces
 fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<String, Error> {
   let mut output = String::new();
 
   // Build class name
   let mut name_build: Option<String> = None;
 
-  // All previously checked characters in string (for check for lookbehind)
-  let mut prev = String::new();
+  // Replace `<` and `>` with `❬` and `❭` respectively, where classes are
+  let pattern = replace_angle_brackets(pattern);
 
   // Loop characters
   for ch in pattern.chars() {
     match ch {
       // Open class name
       // Check that not in lookbehind
-      '<' if !prev.ends_with("(?") => {
+      '❬' => {
         if name_build.is_some() {
           // Name is already building - Another opening bracket should not be there
           return Err(Error::ClassUnexpectedOpenName {
@@ -384,7 +387,7 @@ fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<S
       }
 
       // Close class name
-      '>' => {
+      '❭' => {
         // Get class name
         let name = match name_build {
           Some(x) => x,
@@ -417,8 +420,6 @@ fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<S
 
       // Normal character
       _ => {
-        prev.push(ch);
-
         if let Some(name) = &mut name_build {
           // Name is building - push to name
           name.push(ch);
@@ -433,7 +434,7 @@ fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<S
   // Class name was not finished building, before end of end of pattern
   if name_build.is_some() {
     return Err(Error::ClassUnexpectedEnd {
-      pattern: pattern.to_string(),
+      pattern,
       line,
     });
   }
@@ -441,9 +442,35 @@ fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<S
   Ok(output)
 }
 
+/// Replace ascii `<` and `>` with `❬` and `❭` respectively, for classes
+///
+/// Does not replace `<` and `>` with use in look-behinds or named group definitions or references
+///
+/// Uses `fancy_regex` `replace_all` method, with with capture preservation
+fn replace_angle_brackets(s: &str) -> String {
+  let re = Regex::new(r"(?<!\(\?)(?<!\(\?P)(?<!\\k)<([^>]*)>").expect("Could not parse static regex");
+  re.replace_all(s, r"❬$1❭").to_string()
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
+
+  #[test]
+  fn swap_angle_brackets_works() {
+    assert_eq!(replace_angle_brackets("<abc>"), "❬abc❭");
+    assert_eq!(replace_angle_brackets("(?<=abc)"), "(?<=abc)");
+    assert_eq!(replace_angle_brackets("(?<!abc)"), "(?<!abc)");
+    assert_eq!(replace_angle_brackets("(?<abc>)"), "(?<abc>)");
+    assert_eq!(replace_angle_brackets("(?P<abc>)"), "(?P<abc>)");
+    assert_eq!(replace_angle_brackets(r"\k<abc>"), r"\k<abc>");
+    assert_eq!(replace_angle_brackets(r"(?<a>.)\k<a>"), r"(?<a>.)\k<a>");
+    assert_eq!(replace_angle_brackets("(?:<abc>)"), "(?:❬abc❭)");
+    assert_eq!(replace_angle_brackets("?<abc>"), "?❬abc❭");
+    assert_eq!(replace_angle_brackets("<abc><def>"), "❬abc❭❬def❭");
+    assert_eq!(replace_angle_brackets("<abc><"), "❬abc❭<");
+    assert_eq!(replace_angle_brackets("<abc>>"), "❬abc❭>");
+  }
 
   #[test]
   fn substitute_classes_works() {
@@ -468,23 +495,26 @@ mod tests {
       "[[ptk][aio]]".to_string()
     );
 
+    assert_eq!(
+      substitute_classes("(?<=1)", &classes, 0).unwrap(),
+      "(?<=1)".to_string()
+    );
+
+    assert_eq!(
+      substitute_classes("(?<abc><C>)", &classes, 0).unwrap(),
+      "(?<abc>[ptk])".to_string()
+    );
+
+    assert_eq!(substitute_classes("a>b", &classes, 0).unwrap(), "a>b");
+    assert_eq!(substitute_classes("a<b", &classes, 0).unwrap(), "a<b");
+
     assert!(match substitute_classes("<c>", &classes, 0) {
       Err(Error::ClassNotFound { .. }) => true,
       _ => false,
     });
 
-    assert!(match substitute_classes("a>b", &classes, 0) {
-      Err(Error::ClassUnexpectedCloseName { .. }) => true,
-      _ => false,
-    });
-
     assert!(match substitute_classes("<a<b>c>", &classes, 0) {
-      Err(Error::ClassUnexpectedOpenName { .. }) => true,
-      _ => false,
-    });
-
-    assert!(match substitute_classes("a<b", &classes, 0) {
-      Err(Error::ClassUnexpectedEnd { .. }) => true,
+      Err(Error::ClassNotFound { .. }) => true,
       _ => false,
     });
   }
