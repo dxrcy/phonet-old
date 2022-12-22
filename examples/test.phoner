@@ -47,7 +47,7 @@ $N = [mn]
  @ Any repeated letter (w named group)
 # Backreference
 ;! (? <a>.) \k <a> {1,}
-;! (? P <a>.) \k <a> {1,}
+;! (? P <a>.<C>) \k <a> {1,} <C>
 
 ? + tanta
 ? ! atta

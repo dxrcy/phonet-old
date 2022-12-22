@@ -1,1 +1,1 @@
-$V=[iueoa];$C=[pbtdkgmnfvszcwjl];$_=[<V><C>];$S=[sc];$N=[mn];!x;+^<_>+$;+^<S>?(<C>?<V><N>?)+$;!(.)\1{1,};!<C>{3};!<S>[bdgfvszcwj];!ji;!ij;!wu;!uw
+$V=(?:[iueoa]);$C=(?:[pbtdkgmnfvszcwjl]|sh);$_=(?:[<V><C>]);$S=(?:[sc]);$N=(?:[mn]);!x;+^<_>+$;+^<S>?(<C>?<V><N>?)+$;!(.)\1{1,};!(?<a>.)\k<a>{1,};!(?P<a>.)\k<a>{1,};!<C>^[^a];!<S>[bdgfvszcwj];!ji;!ij;!wu;!uw;!(?<=xxxx)

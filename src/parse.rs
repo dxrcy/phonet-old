@@ -172,16 +172,16 @@ impl Phoner {
                 return Err(Error::ClassAlreadyExist { name, line });
               }
 
+              // Add raw line
+              mini
+                .classes
+                .push(format!("${}={}", name, value.replace(' ', "")));
+
+              // Insert class
               // Wrap value in NON-CAPTURING GROUP (just in case)
               // This is non-capturing, for classes to work with back-references
               // otherwise classes would be inherently capturing, and count towards group index in back-reference
-              let value = format!("(?:{})", value.replace(' ', ""));
-
-              // Add raw line
-              mini.classes.push(format!("${}={}", name, value));
-
-              // Insert class
-              raw_classes.insert(name.to_string(), value);
+              raw_classes.insert(name.to_string(), format!("(?:{})", value.replace(' ', "")));
             }
 
             // Rule
@@ -357,7 +357,7 @@ fn make_regex(raw_rules: Vec<RawRule>, classes: &Classes) -> Result<Vec<Rule>, E
 }
 
 /// Substitute class names regex rule with class values (recursively)
-/// 
+///
 /// `pattern` argument must not contain spaces
 fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<String, Error> {
   let mut output = String::new();
@@ -433,10 +433,7 @@ fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<S
 
   // Class name was not finished building, before end of end of pattern
   if name_build.is_some() {
-    return Err(Error::ClassUnexpectedEnd {
-      pattern,
-      line,
-    });
+    return Err(Error::ClassUnexpectedEnd { pattern, line });
   }
 
   Ok(output)
@@ -448,7 +445,8 @@ fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<S
 ///
 /// Uses `fancy_regex` `replace_all` method, with with capture preservation
 fn replace_angle_brackets(s: &str) -> String {
-  let re = Regex::new(r"(?<!\(\?)(?<!\(\?P)(?<!\\k)<([^>]*)>").expect("Could not parse static regex");
+  let re =
+    Regex::new(r"(?<!\(\?)(?<!\(\?P)(?<!\\k)<([^>]*)>").expect("Could not parse static regex");
   re.replace_all(s, r"❬$1❭").to_string()
 }
 
