@@ -173,9 +173,11 @@ impl Phoner {
               }
 
               // Add raw line
-              mini
-                .classes
-                .push(format!("${}={}", name, value.replace(' ', "")));
+              mini.classes.push(format!(
+                "${}={}",
+                name,
+                value.replace(' ', "").replace('❬', "<").replace('❭', ">")
+              ));
 
               // Insert class
               // Wrap value in NON-CAPTURING GROUP (just in case)
@@ -192,7 +194,9 @@ impl Phoner {
               let pattern = chars.as_str().replace(' ', "");
 
               // Add rule for minify
-              mini.rules.push(first.to_string() + &pattern);
+              mini
+                .rules
+                .push(first.to_string() + &pattern.replace('❬', "<").replace('❭', ">"));
 
               // Add rule
               rules.push(RawRule {
