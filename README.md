@@ -6,6 +6,8 @@ Words can be randomly generated (see [Argument Syntax](#argument-syntax)).
 
 [Syntax Highlighting Extension for VSCode](https://github.com/darccyy/phoner-syntax)
 
+> Name will be renamed to 'Phonet' soon...
+
 # Usage
 
 This project can be used as a rust library, or as a binary.
