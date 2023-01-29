@@ -7,10 +7,13 @@ $_ = [<V>❬C❭]
 
 * the first three tests should FAIL in this example
 
-# no reason
+ # no reason
   ! x
     ?+ axa
     ?! ata
+
+@* * aow * id
+@ *a
 
 @ Contains invalid letters
   + ^ <_>+ $
@@ -31,7 +34,7 @@ $N = [mn]
   # aowidj
 
 # aowidj
-# aowidj;
+# aowidj
 # aowidj
   # aowidj;
 	# aowidj
