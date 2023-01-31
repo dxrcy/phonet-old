@@ -7,7 +7,7 @@ use snafu::prelude::*;
 pub use crate::run::Reason;
 use DisplayLevel::*;
 
-/// Error enum for `Phoner` struct in `parse.rs`
+/// Error enum for `Phonet` struct in `parse.rs`
 #[derive(Debug, Snafu)]
 pub enum Error {
   #[snafu(display("Unknown intent identifier `{ch}`. Must be either `+` or `!`, at line {line}"))]
@@ -105,7 +105,7 @@ pub enum TestResult {
   },
 }
 
-/// Setting for controlling which items are outputted in `PhonerResult::display` method
+/// Setting for controlling which items are outputted in `PhonetResult::display` method
 #[derive(Clone, Copy)]
 pub enum DisplayLevel {
   /// Show everything (passes, notes, fails)

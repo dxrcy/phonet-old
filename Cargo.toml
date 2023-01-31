@@ -1,14 +1,14 @@
 [package]
-name = "phoner"
+name = "phonet"
 version = "0.7.0"
 edition = "2021"
 description = "A CLI tool and library to validate phonotactic patterns for constructed languages"
 license = "MIT"
-documentation = "https://docs.rs/phoner/latest/phoner"
-repository = "https://github.com/darccyy/phoner"
+documentation = "https://docs.rs/phonet/latest/phonet"
+repository = "https://github.com/darccyy/phonet"
 authors = ["darcy"]
 keywords = ["phoner", "phone", "regex", "lang", "conlang"]
-exclude = ["target", "examples/test.min.phoner"]
+exclude = ["target", "examples/test.min.phonet"]
 
 [dependencies]
 clap = { version = "4.0.29", features = ["derive"] }

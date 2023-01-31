@@ -4,7 +4,7 @@ use std::fs;
 
 use args::Args;
 use clap::Parser;
-use phoner::{types::TestDefinition, Phoner};
+use phonet::{types::TestDefinition, Phonet};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
   let args = Args::parse();
@@ -13,7 +13,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
   let file = fs::read_to_string(&args.file)?;
 
   // Parse file
-  let mut scheme = Phoner::parse(&file)
+  let mut scheme = Phonet::parse(&file)
     .map_err(|err| err.to_string())
     .expect("Failed to parse file");
 
@@ -119,8 +119,8 @@ mod tests {
   #[test]
   fn get_min_filename_works() {
     assert_eq!(get_min_filename(""), "");
-    assert_eq!(get_min_filename("phoner"), "min.phoner");
-    assert_eq!(get_min_filename("myfile.phoner"), "myfile.min.phoner");
-    assert_eq!(get_min_filename("one.two.phoner"), "one.two.min.phoner");
+    assert_eq!(get_min_filename("phonet"), "min.phonet");
+    assert_eq!(get_min_filename("myfile.phonet"), "myfile.min.phonet");
+    assert_eq!(get_min_filename("one.two.phonet"), "one.two.min.phonet");
   }
 }

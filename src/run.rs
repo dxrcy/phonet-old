@@ -1,27 +1,27 @@
 use crate::{
   types::{Rule, TestDefinition, TestResult},
   DisplayLevel::{self, *},
-  Phoner,
+  Phonet,
 };
 use Reason::*;
 use ValidStatus::*;
 
 /// Results from run tests
 ///
-/// Create with `PhonerResults::run()`
-pub struct PhonerResults {
+/// Create with `PhonetResults::run()`
+pub struct PhonetResults {
   /// List of results of each test
   pub list: Vec<TestResult>,
   /// Amount of failed tests
   pub fail_count: u32,
 }
 
-impl PhonerResults {
+impl PhonetResults {
   /// Run tests, return results
-  pub fn run(scheme: &Phoner) -> PhonerResults {
+  pub fn run(scheme: &Phonet) -> PhonetResults {
     // No tests
     if scheme.tests.is_empty() {
-      return PhonerResults {
+      return PhonetResults {
         list: Vec::new(),
         fail_count: 0,
       };
@@ -76,7 +76,7 @@ impl PhonerResults {
       }
     }
 
-    PhonerResults { list, fail_count }
+    PhonetResults { list, fail_count }
   }
 
   /// Get maximum length of all test words

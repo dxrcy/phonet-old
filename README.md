@@ -1,12 +1,12 @@
-# Phoner
+# Phonet
 
-_Phoner_ is a CLI tool and library to validate phonotactic patterns for constructed languages.
+_Phonet_ is a CLI tool and library to validate phonotactic patterns for constructed languages.
 It is compatible with either romanization and phonetic transcription.
 Words can be randomly generated (see [Argument Syntax](#argument-syntax)).
 
-[Syntax Highlighting Extension for VSCode](https://github.com/darccyy/phoner-syntax)
+[Syntax Highlighting Extension for VSCode](https://github.com/darccyy/phonet-syntax)
 
-> Name will be renamed to 'Phonet' soon...
+> Formerly named 'Phonet'
 
 # Usage
 
@@ -14,14 +14,14 @@ This project can be used as a rust library, or as a binary.
 
 ## Binary use
 
-[Download latest version here](https://github.com/darccyy/phoner/releases/latest)
+[Download latest version here](https://github.com/darccyy/phonet/releases/latest)
 
 ### Argument Syntax
 
 ```
-$ phoner --help
+$ phonet --help
 
-Usage: phoner.exe [OPTIONS] [TESTS]
+Usage: phonet.exe [OPTIONS] [TESTS]
 
 Options:
   -t, --tests <TESTS>
@@ -30,16 +30,16 @@ Options:
   -f, --file <FILE>
       Name and path of file to run and test
 
-      Eg. `phoner -f ./myfile.phoner`
+      Eg. `phonet -f ./myfile.phonet`
 
-      [default: phoner]
+      [default: phonet]
 
   -d, --display-level <DISPLAY_LEVEL>
       What types of outputs to display
 
       Options can be single letter
 
-      Eg. `phoner -d just-fails` or `phoner -df`
+      Eg. `phonet -d just-fails` or `phonet -df`
 
       [default: show-all]
 
@@ -84,38 +84,38 @@ Options:
 ### Example
 
 ```bash
-# Runs ./phoner
-phoner
+# Runs ./phonet
+phonet
 
-# Runs ./phoner, with tests: 'some', 'words' (instead of tests in file)
-phoner -t some,words
+# Runs ./phonet, with tests: 'some', 'words' (instead of tests in file)
+phonet -t some,words
 
-# Runs ./myfile.phoner
-phoner -f myfile.phoner
+# Runs ./myfile.phonet
+phonet -f myfile.phonet
 
-# Runs ./phoner, only showing fails
-phoner -df
+# Runs ./phonet, only showing fails
+phonet -df
 # Alternatives:
-phoner -d just-fails
-phoner -d fails
+phonet -d just-fails
+phonet -d fails
 
-# Runs ./phoner, and minifies to ./min.phoner without tests
-phoner -m
+# Runs ./phonet, and minifies to ./min.phonet without tests
+phonet -m
 
-# Runs ./myfile.phoner, without outputting any results, and minifies to ./myfile.min.phoner with tests
-phoner -f myfile.phoner -dh -mt
+# Runs ./myfile.phonet, without outputting any results, and minifies to ./myfile.min.phonet with tests
+phonet -f myfile.phonet -dh -mt
 
-# Runs ./phoner, and generates 1 random word
-phoner -g
+# Runs ./phonet, and generates 1 random word
+phonet -g
 
-# Runs ./myfile.phoner, and generates 10 random words
-phoner -g10 -g myfile.phoner
+# Runs ./myfile.phonet, and generates 10 random words
+phonet -g10 -g myfile.phonet
 
-# Runs ./phoner, with no color, and writes output to ./phoner.txt
-phoner -n > phoner.txt
+# Runs ./phonet, with no color, and writes output to ./phonet.txt
+phonet -n > phonet.txt
 
-# Runs ./myfile.phoner, with all test output hidden, and generates 3 random words with length 6-8, writes output to ./phoner.txt (with no color)
-phoner -f myfile.phoner -nd h -g 3 --gmin 6 --gmax 8 > ./phoner.txt
+# Runs ./myfile.phonet, with all test output hidden, and generates 3 random words with length 6-8, writes output to ./phonet.txt (with no color)
+phonet -f myfile.phonet -nd h -g 3 --gmin 6 --gmax 8 > ./phonet.txt
 ```
 
 ### Create Alias / Path
@@ -128,7 +128,7 @@ Add alias in `.bashrc` in user directory
 
 ```bash
 # ~/.bashrc
-alias phoner="<path_to_file>/phoner.exe"
+alias phonet="<path_to_file>/phonet.exe"
 ```
 
 #### Powershell
@@ -136,26 +136,26 @@ alias phoner="<path_to_file>/phoner.exe"
 Add to `$env:PATH`
 
 ```ps1
-$env:Path = "$env:Path;<path_to_file>\phoner.exe"
+$env:Path = "$env:Path;<path_to_file>\phonet.exe"
 ```
 
 ## Library use
 
-Add `phoner = "0.7.0"` to your `Crates.toml` file
+Add `phonet = "0.7.0"` to your `Crates.toml` file
 
-- [Docs.rs](https://docs.rs/phoner/latest/phoner)
-- [Crates.io](https://crates.io/crates/phoner)
+- [Docs.rs](https://docs.rs/phonet/latest/phonet)
+- [Crates.io](https://crates.io/crates/phonet)
 
 Short example:
 
 ```rust
-use phoner::Phoner;
+use phonet::Phonet;
 
 fn main() {
-  let file = std::fs::read_to_string("phoner").unwrap();
+  let file = std::fs::read_to_string("phonet").unwrap();
 
   // Parse file
-  Phoner::parse(&file).unwrap()
+  Phonet::parse(&file).unwrap()
     // Run tests
     .run(scheme)
     // Display results
@@ -166,13 +166,13 @@ fn main() {
 Long example:
 
 ```rust
-use phoner::{Phoner, DisplayLevel};
+use phonet::{Phonet, DisplayLevel};
 
 fn main() {
-  let file = std::fs::read_to_string("phoner").unwrap();
+  let file = std::fs::read_to_string("phonet").unwrap();
 
   // Parse file
-  let scheme = Phoner::parse(&file).unwrap();
+  let scheme = Phonet::parse(&file).unwrap();
 
   // Run tests
   let results = scheme.run(scheme);
@@ -188,11 +188,11 @@ fn main() {
 
 # File syntax
 
-A _Phoner_ file is used to define the rules, classes, and tests for the program.
+A _Phonet_ file is used to define the rules, classes, and tests for the program.
 
-The file should either be called `phoner`, or end in `.phoner`
+The file should either be called `phonet`, or end in `.phonet`
 
-[Syntax Highlighting Extension for VSCode](https://github.com/darccyy/phoner-syntax)
+[Syntax Highlighting Extension for VSCode](https://github.com/darccyy/phonet-syntax)
 
 ## Statements
 
@@ -237,7 +237,7 @@ The `any` class, defined with `$_ = ...`, is used for random word generation.
 
 _Example:_
 
-```phoner
+```phonet
 # Some consonants
 $C = [ptksmn]
 
@@ -266,7 +266,7 @@ _Syntax:_
 
 _Example (with predefined [*classes*](#classes)):_
 
-```phoner
+```phonet
 # Must be (C)V syllable structure
 + ^ (<C>? <V>)+ $
 
@@ -293,7 +293,7 @@ _Syntax:_
 
 _Example (with predefined [*rules*](#rules)):_
 
-```phoner
+```phonet
 # This should match, to pass
 ?+ taso
 # This test should NOT match, to pass
@@ -314,7 +314,7 @@ _Syntax:_
 
 _Example:_
 
-```phoner
+```phonet
 @ Syllable structure
 + ^ (<C>? <V>)+ $
 
@@ -341,7 +341,7 @@ _Syntax:_
 
 _Example (with predefined rules):_
 
-```phoner
+```phonet
 * Should match
 ?+ taso
 
@@ -351,7 +351,7 @@ _Example (with predefined rules):_
 
 ## Mode
 
-The mode of a _Phoner_ file can be one of these:
+The mode of a _Phonet_ file can be one of these:
 
 - _Romanized_: Using `<>`
 - _Broad transcription_: Using `//`
@@ -366,23 +366,23 @@ _Syntax:_
 
 _Examples:_
 
-```phoner
+```phonet
 # Specify romanized mode (fish icon)
 ~<>
 ```
 
-```phoner
+```phonet
 # Specify broad transcription
 ~ / this is the mode /
 ```
 
 ## Examples
 
-See the [examples](./examples/) folder for _Phoner_ file examples.
+See the [examples](./examples/) folder for _Phonet_ file examples.
 
-- [Good Syntax Example](./examples/example.phoner)
-- [Toki Pona](./examples/tokipona.phoner)
-- [Ivalingo](./examples/ivalingo.phoner)
+- [Good Syntax Example](./examples/example.phonet)
+- [Toki Pona](./examples/tokipona.phonet)
+- [Ivalingo](./examples/ivalingo.phonet)
 
 ## Recommended Syntax Patterns
 
@@ -396,9 +396,9 @@ These formatting tips are not required, but recommended to make the file easier 
 4. Indent rules and tests under notes or reasons
    - Rules should use 1 intent, tests use 2
 
-_Example (this is from [example.phoner](./examples/example.phoner)):_
+_Example (this is from [example.phonet](./examples/example.phonet)):_
 
-```phoner
+```phonet
 ~<> ;# Mode (optional) - This file uses romanized letters
 
 # Class definitions
@@ -431,7 +431,7 @@ $V = [aeiou]          ;# Vowels
     ?! taaso ttaso
 ```
 
-![Phoner Icon](./icon.png)
+![Phonet Icon](./icon.png)
 
 # TODO
 

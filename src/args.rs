@@ -2,13 +2,13 @@
 
 use clap::{builder::PossibleValue, Parser, ValueEnum};
 
-use phoner::DisplayLevel::{self, *};
+use phonet::DisplayLevel::{self, *};
 
 #[derive(Parser)]
 #[clap(author, version)]
 /// A program to validate phonotactic patterns
 ///
-/// More information: https://github.com/darccyy/phoner
+/// More information: https://github.com/darccyy/phonet
 pub struct Args {
   /// Custom test, separate with comma (Ignores tests in file)
   #[arg(short, long)]
@@ -16,15 +16,15 @@ pub struct Args {
 
   /// Name and path of file to run and test
   ///
-  /// Eg. `phoner -f ./myfile.phoner`
-  #[arg(short, long, default_value_t = String::from("phoner"))]
+  /// Eg. `phonet -f ./myfile.phonet`
+  #[arg(short, long, default_value_t = String::from("phonet"))]
   pub file: String,
 
   /// What types of outputs to display
   ///
   /// Options can be single letter
   ///
-  /// Eg. `phoner -d just-fails` or `phoner -df`
+  /// Eg. `phonet -d just-fails` or `phonet -df`
   #[arg(short, long, default_value_t = ShowAll, value_enum)]
   pub display_level: DisplayLevel,
 

@@ -8,7 +8,7 @@ use crate::{
     Error::{self, *},
     Rule, TestDefinition,
   },
-  PhonerResults,
+  PhonetResults,
 };
 
 struct RawRule {
@@ -60,7 +60,7 @@ impl Default for Mode {
 ///
 /// Holds rules and tests
 #[derive(Debug)]
-pub struct Phoner {
+pub struct Phonet {
   /// Defined rules
   pub rules: Vec<Rule>,
   /// Tests to run
@@ -75,9 +75,9 @@ pub struct Phoner {
   mini: Mini,
 }
 
-impl Phoner {
-  /// Parse `Phoner` from string
-  pub fn parse(file: &str) -> Result<Phoner, Error> {
+impl Phonet {
+  /// Parse `Phonet` from string
+  pub fn parse(file: &str) -> Result<Phonet, Error> {
     // Builders
     let mut raw_classes: Classes = HashMap::new();
     let mut tests: Vec<TestDefinition> = Vec::new();
@@ -298,7 +298,7 @@ impl Phoner {
     // Use default mode if not given
     let mode = mode.unwrap_or_default();
 
-    Ok(Phoner {
+    Ok(Phonet {
       rules,
       tests,
       reasons,
@@ -308,7 +308,7 @@ impl Phoner {
     })
   }
 
-  /// Minify Phoner scheme as string
+  /// Minify Phonet scheme as string
   pub fn minify(&self, do_tests: bool) -> String {
     let s = ';';
     let c = self.mini.classes.join(";");
@@ -328,8 +328,8 @@ impl Phoner {
   }
 
   /// Run tests, return results
-  pub fn run(&self) -> PhonerResults {
-    PhonerResults::run(self)
+  pub fn run(&self) -> PhonetResults {
+    PhonetResults::run(self)
   }
 }
 
