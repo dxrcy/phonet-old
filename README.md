@@ -6,7 +6,7 @@ Words can be randomly generated (see [Argument Syntax](#argument-syntax)).
 
 [Syntax Highlighting Extension for VSCode](https://github.com/darccyy/phonet-syntax)
 
-> Formerly named 'Phonet'
+> Formerly named 'Phoner'
 
 # Usage
 
