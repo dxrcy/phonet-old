@@ -3,7 +3,7 @@
 $V = [iueoa]
 $C = [pbtdkgmnfvszcwjl]|sh
 # any character
-$_ = [<V>❬C❭]
+$_ = [<V>⟨C⟩]
 
 * the first three tests should FAIL in this example
 
@@ -25,7 +25,7 @@ $S = [sc]
 $N = [mn]
 
 @ Basic structure
-  + ^ <S>? (❬C❭? ⟨V⟩ <N>?)+ $
+  + ^ <S>? (⟨C⟩? ⟨V⟩ <N>?)+ $
     ?+ pono
     ? + stononononononononononononononon
     ? +slono ; ? + sonto
@@ -59,7 +59,7 @@ $N = [mn]
 ? ! taata
 
 @ More than 2 seq. consonants
-  ! ❬C❭ ^[^a]
+  ! ⟨C⟩ ^[^a]
 
     ? + apa
     ? ! aspla assa asssa

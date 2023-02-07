@@ -447,13 +447,9 @@ fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<S
 ///
 /// Uses `fancy_regex` `replace_all` method, with with capture preservation
 fn replace_angle_brackets(s: &str) -> String {
-    let re_1 = regex!(r"(?<!\(\?)(?<!\(\?P)(?<!\\k)<([^>]*)>");
-
-    // (deprecated)
-    let re_2 = regex!(r"❬([^❭]*)❭");
-
-    let s = re_1.replace_all(s, r"⟨$1⟩");
-    re_2.replace_all(&s, r"⟨$1⟩").to_string()
+    regex!(r"(?<!\(\?)(?<!\(\?P)(?<!\\k)<([^>]*)>")
+        .replace_all(s, r"⟨$1⟩")
+        .to_string()
 }
 
 #[cfg(test)]
@@ -474,12 +470,6 @@ mod tests {
         assert_eq!(replace_angle_brackets("<abc><def>"), "⟨abc⟩⟨def⟩");
         assert_eq!(replace_angle_brackets("<abc><"), "⟨abc⟩<");
         assert_eq!(replace_angle_brackets("<abc>>"), "⟨abc⟩>");
-
-        // (deprecated)
-        assert_eq!(replace_angle_brackets("❬abc❭"), "⟨abc⟩");
-        assert_eq!(replace_angle_brackets("❬abc❭❬def❭"), "⟨abc⟩⟨def⟩");
-        assert_eq!(replace_angle_brackets("❬abc❭❬"), "⟨abc⟩❬");
-        assert_eq!(replace_angle_brackets("❬abc❭❭"), "⟨abc⟩❭");
     }
 
     #[test]
