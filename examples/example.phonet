@@ -28,3 +28,5 @@ $V = [aeiou]          ;# Vowels
   ! (?<x> .) \k<x>    ;# This is a named back-reference (NOT a class)
     ?+ taso
     ?! taaso ttaso
+
+* 2 tests *should* have failed!
