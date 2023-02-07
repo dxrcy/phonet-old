@@ -16,4 +16,4 @@ fancy-regex = "0.10.0"
 once_cell = "1.17.0"
 rand = "0.8.5"
 snafu = "0.7.3"
-fancy-regex-macro = { git = "https://github.com/darccyy/fancy-regex-macro.git" }
+fancy-regex-macro = { git = "https://github.com/darccyy/fancy-regex-macro.git", version = "0.1.0" }
