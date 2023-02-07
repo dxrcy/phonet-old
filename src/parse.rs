@@ -409,7 +409,7 @@ fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<S
                 let Some(value) = classes.get(&name) else {
             // Class name was not found
             return Err(Error::ClassNotFound {
-                name: name.to_string(),
+                name,
                 line,
             });
         };
