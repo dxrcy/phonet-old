@@ -119,6 +119,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "fancy-regex"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b95f7c0680e4142284cf8b22c14a476e87d61b004a3a0861872b32ef7ead40a2"
+dependencies = [
+ "bit-set",
+ "regex",
+]
+
+[[package]]
+name = "fancy-regex-macro"
+version = "0.1.0"
+source = "git+https://github.com/darccyy/fancy-regex-macro.git#b05df4ed1aca9ef12e54d2fc93b4f0a11b31c88c"
+dependencies = [
+ "fancy-regex 0.11.0",
+ "once_cell",
+]
+
+[[package]]
 name = "getrandom"
 version = "0.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -186,9 +205,9 @@ checksum = "2dffe52ecf27772e601905b7522cb4ef790d2cc203488bbd0e2fe85fcb74566d"
 
 [[package]]
 name = "once_cell"
-version = "1.16.0"
+version = "1.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "86f0b0d4bf799edbc74508c1e8bf170ff5f41238e5f8225603ca7caaae2b7860"
+checksum = "6f61fba1741ea2b3d6a1e3178721804bb716a68a6aeba1149b5d52e3d464ea66"
 
 [[package]]
 name = "os_str_bytes"
@@ -201,7 +220,9 @@ name = "phonet"
 version = "0.8.1"
 dependencies = [
  "clap",
- "fancy-regex",
+ "fancy-regex 0.10.0",
+ "fancy-regex-macro",
+ "once_cell",
  "rand",
  "snafu",
 ]

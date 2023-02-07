@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use fancy_regex::Regex;
+use fancy_regex_macro::regex;
 
 use crate::{
   types::{
@@ -92,8 +93,6 @@ impl Phonet {
     // Mode
     let mut mode: Option<Mode> = None;
 
-    let class_name_pattern = Regex::new(r"^\w+$").expect("Could not parse static regex");
-
     // Split at line
     for (line, line_statements) in file.lines().enumerate() {
       // Line number (as in file)
@@ -154,7 +153,7 @@ impl Phonet {
               };
 
               // Check if name is valid
-              if !class_name_pattern
+              if !regex!(r"^\w+$")
                 .is_match(&name)
                 .expect("Failed checking regex match. This error should NEVER APPEAR!")
               {
@@ -449,11 +448,10 @@ fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<S
 ///
 /// Uses `fancy_regex` `replace_all` method, with with capture preservation
 fn replace_angle_brackets(s: &str) -> String {
-  let re_1 =
-    Regex::new(r"(?<!\(\?)(?<!\(\?P)(?<!\\k)<([^>]*)>").expect("Could not parse static regex");
+  let re_1 = regex!(r"(?<!\(\?)(?<!\(\?P)(?<!\\k)<([^>]*)>");
 
   // (deprecated)
-  let re_2 = Regex::new(r"❬([^❭]*)❭").expect("Could not parse static regex");
+  let re_2 = regex!(r"❬([^❭]*)❭");
 
   let s = re_1.replace_all(s, r"⟨$1⟩");
   re_2.replace_all(&s, r"⟨$1⟩").to_string()
