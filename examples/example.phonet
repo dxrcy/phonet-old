@@ -6,7 +6,7 @@ $C = [ptkmnswjl]      ;# Consonants
 $V = [aeiou]          ;# Vowels
 
 @* Invalid letters    ;# Noted reason - Prints like a note to standard output
-  + ^ <_>+ $          ;# Check that every letter is in the 'any' group
+  + ^ ⟨_⟩+ $          ;# Check that every letter is in the 'any' group
     ?+ taso
     ?! tyxo
 
@@ -15,7 +15,7 @@ $V = [aeiou]          ;# Vowels
     ?! taso           ;# This test will fail, as a false positive
 
 @* Syllable structure
-  + ^ ( <C> <V> )+ $  ;# Check that word is Consonant + Vowel, repeating at least once
+  + ^ ( ⟨C⟩ ⟨V⟩ )+ $  ;# Check that word is Consonant + Vowel, repeating at least once
     ?+ taso kili
     ?! ano taaso
 
