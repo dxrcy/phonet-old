@@ -231,7 +231,7 @@ _Syntax:_
 - `$` _Dollar_
 - Name - Must be only characters from [a-zA-Z0-9_]
 - `=` _Equals_
-- Value - Regular Expression, may contain other _classes_ in angle brackets `<>` (as with [_rules_](#rules))
+- Value - Regular Expression, may contain other _classes_ in angle brackets `<>` or `⟨⟩` (as with [_rules_](#rules))
 
 The `any` class, defined with `$_ = ...`, is used for random word generation.
 
@@ -257,12 +257,12 @@ Rules are defined with an _intent_, either `+` for _positive_, or `!` for _negat
 - A _positive_ rule must be followed for a word to be valid
 - A _negative_ rule must **not** be followed for a word to be valid
 
-To use a [_class_](#classes), use the class name, surrounded by angle brackets `<>`.
+To use a [_class_](#classes), use the class name, surrounded by angle brackets `<>` or `⟨⟩`.
 
 _Syntax:_
 
 - `+` **_Plus_** or `!` **_Bang_** - Plus for _positive_ rule, Bang for _negative_ rule
-- Pattern - Regular Expression, may contain [_classes_](#classes) in angle brackets `<>`
+- Pattern - Regular Expression, may contain [_classes_](#classes) in angle brackets `<>` or `⟨⟩`
 
 _Example (with predefined [*classes*](#classes)):_
 
@@ -353,7 +353,7 @@ _Example (with predefined rules):_
 
 The mode of a _Phonet_ file can be one of these:
 
-- _Romanized_: Using `<>`
+- _Romanized_: Using `<>` (not `⟨⟩`)
 - _Broad transcription_: Using `//`
 - _Narrow transcription_: Using `[]`
 
