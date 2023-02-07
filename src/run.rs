@@ -94,8 +94,8 @@ impl PhonetResults {
           // Don't include
           _ => 0,
         },
-        // Note
-        _ => 0,
+
+        TestResult::Note(_) => 0,
       })
       .max()
       // Default value
@@ -232,7 +232,7 @@ pub enum Reason {
 impl Reason {
   fn from(validity: ValidStatus, reasons: &[String]) -> Self {
     match validity {
-      // Test was valid, but it should have been invalid 
+      // Test was valid, but it should have been invalid
       Valid => ShouldBeInvalid,
 
       // Test was invalid, but it should have been valid

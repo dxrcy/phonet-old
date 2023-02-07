@@ -6,7 +6,6 @@ use crate::{types::Error, validate_test, Phonet};
 
 impl Phonet {
   /// Generate random words that fit the rules
-  /// TODO Use const generic ???????
   pub fn generate(&self, count: usize, length: Range<usize>) -> Result<Vec<String>, Error> {
     //TODO Handle
     let letters = match self.classes.get("_") {

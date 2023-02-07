@@ -404,15 +404,12 @@ fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<S
         };
 
         // Get class value
-        let value = match classes.get(&name) {
-          Some(x) => x,
-          None => {
+        let Some(value) = classes.get(&name) else {
             // Class name was not found
             return Err(Error::ClassNotFound {
-              name: name.to_string(),
-              line,
+                name: name.to_string(),
+                line,
             });
-          }
         };
 
         // Add value to output (recursively)
