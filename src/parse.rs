@@ -176,7 +176,7 @@ impl Phonet {
               mini.classes.push(format!(
                 "${}={}",
                 name,
-                value.replace(' ', "").replace('❬', "<").replace('❭', ">")
+                value.replace(' ', "").replace('⟨', "<").replace('⟩', ">")
               ));
 
               // Insert class
@@ -196,7 +196,7 @@ impl Phonet {
               // Add rule for minify
               mini
                 .rules
-                .push(first.to_string() + &pattern.replace('❬', "<").replace('❭', ">"));
+                .push(first.to_string() + &pattern.replace('⟨', "<").replace('⟩', ">"));
 
               // Add rule
               rules.push(RawRule {
@@ -369,7 +369,7 @@ fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<S
   // Build class name
   let mut name_build: Option<String> = None;
 
-  // Replace `<` and `>` with `❬` and `❭` respectively, where classes are
+  // Replace `<` and `>` with `⟨` and `⟩` respectively, where classes are
   let pattern = replace_angle_brackets(pattern);
 
   // Loop characters
@@ -377,7 +377,7 @@ fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<S
     match ch {
       // Open class name
       // Check that not in lookbehind
-      '❬' => {
+      '⟨' => {
         if name_build.is_some() {
           // Name is already building - Another opening bracket should not be there
           return Err(Error::ClassUnexpectedOpenName {
@@ -391,7 +391,7 @@ fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<S
       }
 
       // Close class name
-      '❭' => {
+      '⟩' => {
         // Get class name
         let name = match name_build {
           Some(x) => x,
@@ -443,18 +443,20 @@ fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<S
   Ok(output)
 }
 
-/// Replace ascii `<` and `>` with `❬` and `❭` respectively, for classes
+/// Replace ascii `<` and `>` with `⟨` and `⟩` respectively, for classes
 ///
 /// Does not replace `<` and `>` with use in look-behinds or named group definitions or references
 ///
 /// Uses `fancy_regex` `replace_all` method, with with capture preservation
 fn replace_angle_brackets(s: &str) -> String {
-  let re =
+  let re_1 =
     Regex::new(r"(?<!\(\?)(?<!\(\?P)(?<!\\k)<([^>]*)>").expect("Could not parse static regex");
-  let s = re.replace_all(s, r"❬$1❭").to_string();
 
-  let re = Regex::new(r"⟨([^⟩]*)⟩").expect("Could not parse static regex");
-  re.replace_all(&s, r"❬$1❭").to_string()
+  // (deprecated)
+  let re_2 = Regex::new(r"❬([^❭]*)❭").expect("Could not parse static regex");
+
+  let s = re_1.replace_all(s, r"⟨$1⟩");
+  re_2.replace_all(&s, r"⟨$1⟩").to_string()
 }
 
 #[cfg(test)]
@@ -463,23 +465,24 @@ mod tests {
 
   #[test]
   fn swap_angle_brackets_works() {
-    assert_eq!(replace_angle_brackets("<abc>"), "❬abc❭");
+    assert_eq!(replace_angle_brackets("<abc>"), "⟨abc⟩");
     assert_eq!(replace_angle_brackets("(?<=abc)"), "(?<=abc)");
     assert_eq!(replace_angle_brackets("(?<!abc)"), "(?<!abc)");
     assert_eq!(replace_angle_brackets("(?<abc>)"), "(?<abc>)");
     assert_eq!(replace_angle_brackets("(?P<abc>)"), "(?P<abc>)");
     assert_eq!(replace_angle_brackets(r"\k<abc>"), r"\k<abc>");
     assert_eq!(replace_angle_brackets(r"(?<a>.)\k<a>"), r"(?<a>.)\k<a>");
-    assert_eq!(replace_angle_brackets("(?:<abc>)"), "(?:❬abc❭)");
-    assert_eq!(replace_angle_brackets("?<abc>"), "?❬abc❭");
-    assert_eq!(replace_angle_brackets("<abc><def>"), "❬abc❭❬def❭");
-    assert_eq!(replace_angle_brackets("<abc><"), "❬abc❭<");
-    assert_eq!(replace_angle_brackets("<abc>>"), "❬abc❭>");
+    assert_eq!(replace_angle_brackets("(?:<abc>)"), "(?:⟨abc⟩)");
+    assert_eq!(replace_angle_brackets("?<abc>"), "?⟨abc⟩");
+    assert_eq!(replace_angle_brackets("<abc><def>"), "⟨abc⟩⟨def⟩");
+    assert_eq!(replace_angle_brackets("<abc><"), "⟨abc⟩<");
+    assert_eq!(replace_angle_brackets("<abc>>"), "⟨abc⟩>");
 
-    assert_eq!(replace_angle_brackets("⟨abc⟩"), "❬abc❭");
-    assert_eq!(replace_angle_brackets("⟨abc⟩⟨def⟩"), "❬abc❭❬def❭");
-    assert_eq!(replace_angle_brackets("⟨abc⟩⟨"), "❬abc❭⟨");
-    assert_eq!(replace_angle_brackets("⟨abc⟩⟩"), "❬abc❭⟩");
+    // (deprecated)
+    assert_eq!(replace_angle_brackets("❬abc❭"), "⟨abc⟩");
+    assert_eq!(replace_angle_brackets("❬abc❭❬def❭"), "⟨abc⟩⟨def⟩");
+    assert_eq!(replace_angle_brackets("❬abc❭❬"), "⟨abc⟩❬");
+    assert_eq!(replace_angle_brackets("❬abc❭❭"), "⟨abc⟩❭");
   }
 
   #[test]
