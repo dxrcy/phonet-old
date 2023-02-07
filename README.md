@@ -435,6 +435,8 @@ $V = [aeiou]          ;# Vowels
 
 # TODO
 
+- Switch angle brackets from `❬❭` to `⟨⟩`
+
 - Check all `.len()` calls on strings, check for non-ascii problems (use `.chars().count()`)
 - Add line number traceback to initial class substitution error
 - Add more docs

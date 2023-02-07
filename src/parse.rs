@@ -451,7 +451,10 @@ fn substitute_classes(pattern: &str, classes: &Classes, line: usize) -> Result<S
 fn replace_angle_brackets(s: &str) -> String {
   let re =
     Regex::new(r"(?<!\(\?)(?<!\(\?P)(?<!\\k)<([^>]*)>").expect("Could not parse static regex");
-  re.replace_all(s, r"❬$1❭").to_string()
+  let s = re.replace_all(s, r"❬$1❭").to_string();
+
+  let re = Regex::new(r"⟨([^⟩]*)⟩").expect("Could not parse static regex");
+  re.replace_all(&s, r"❬$1❭").to_string()
 }
 
 #[cfg(test)]
@@ -472,6 +475,11 @@ mod tests {
     assert_eq!(replace_angle_brackets("<abc><def>"), "❬abc❭❬def❭");
     assert_eq!(replace_angle_brackets("<abc><"), "❬abc❭<");
     assert_eq!(replace_angle_brackets("<abc>>"), "❬abc❭>");
+
+    assert_eq!(replace_angle_brackets("⟨abc⟩"), "❬abc❭");
+    assert_eq!(replace_angle_brackets("⟨abc⟩⟨def⟩"), "❬abc❭❬def❭");
+    assert_eq!(replace_angle_brackets("⟨abc⟩⟨"), "❬abc❭⟨");
+    assert_eq!(replace_angle_brackets("⟨abc⟩⟩"), "❬abc❭⟩");
   }
 
   #[test]
