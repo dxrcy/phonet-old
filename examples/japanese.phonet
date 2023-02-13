@@ -5,9 +5,19 @@ $V = [aiueo]
 
 $_ = [kstnhmyrwaiueo]
 
-$CV = {
-  []
-}
+$CV = &
+  ⟨V⟩
+  |k⟨V⟩
+  |(s[aueo]|shi)
+  |(t[aeo]|chi|tsu)
+  |n⟨V⟩
+  |(h[aieo]|fu)
+  |m⟨V⟩
+  |y[auo]
+  |r⟨V⟩
+  |w[aieo]
+;
 
 @* Syllable structure
   + ^ (⟨C⟩? ⟨V⟩ n?)+ $
+  + ^ (⟨CV⟩? n?)+ $
