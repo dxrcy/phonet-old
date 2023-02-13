@@ -78,6 +78,14 @@ pub struct Phonet {
 }
 
 impl Phonet {
+    /// Get count of tests in list
+    pub fn test_count(&self) -> usize {
+        self.tests
+            .iter()
+            .filter(|item| matches!(item, TestDefinition::Test { .. }))
+            .count()
+    }
+
     /// Parse `Phonet` from string
     pub fn parse(file: &str) -> Result<Phonet, Error> {
         // Builders

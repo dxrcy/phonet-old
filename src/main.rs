@@ -37,11 +37,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Run tests and display
-    if !scheme.tests.is_empty() {
+    let test_count = scheme.test_count();
+    if test_count > 0 {
         if args.no_color {
-            println!("Running {} tests...", scheme.tests.len());
+            println!("Running {} tests...", test_count);
         } else {
-            println!("\x1b[3;33mRunning {} tests...\x1b[0m", scheme.tests.len());
+            println!("\x1b[3;33mRunning {} tests...\x1b[0m", test_count);
         }
     }
     scheme.run().display(args.display_level, args.no_color);

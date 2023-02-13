@@ -101,12 +101,20 @@ impl PhonetResults {
             .unwrap_or(10)
     }
 
+    /// Get count of tests in list
+    pub fn test_count(&self) -> usize {
+        self.list
+            .iter()
+            .filter(|item| matches!(item, TestResult::Test { .. }))
+            .count()
+    }
+
     /// Display results to standard output
     ///
     /// This can be implemented manually
     pub fn display(&self, display_level: DisplayLevel, no_color: bool) {
         // No tests
-        if self.list.is_empty() {
+        if self.test_count() == 0 {
             if no_color {
                 println!("No tests ran.");
             } else {
