@@ -1,7 +1,13 @@
-~<>
+ab
+
+ ~<> &~<a;
+
+ ~&a;;
+
+$V
 
 $V = [iueoa]
-$C = [pbtdkgmnfvszcwjl]|sh
+$C = [pbtdkgmnfvszcwjl]|sh 
 # any character
 $_ = [<V>⟨C⟩]
 
@@ -9,7 +15,7 @@ $_ = [<V>⟨C⟩]
 
  # no reason
   ! x
-    ?+ axa
+    ?+ axa;
     ?! ata
 
 @* * aow * id
@@ -84,7 +90,8 @@ $N = [mn]
         ? + aju
         ? ! awu
 
-@ Some more tests
+@ Some m&
+ore tests
 
 ? + telo tenlo
 ? ! telno
@@ -98,15 +105,17 @@ $Hello = &
   |b
 ;
 
-! &
-  helo
+! &awdi|oaiwdj
+  helo?
+  [a|a]
 ;
 
 ?+ &
   hey
   hello
 ;
+ a $C = 
 
-?! &
-  helo
-;
+?! &      ?+ not another statment
+  helo    + # Not a comment
+  oawid   ;# yes comment
