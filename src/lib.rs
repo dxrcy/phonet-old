@@ -4,8 +4,12 @@ mod gen;
 mod parse;
 /// Handles running of tests
 mod run;
+/// Split file into statements
+mod statements;
 /// Holds simple types and structs
 pub mod types;
+
+mod error;
 
 pub use parse::Phonet;
 pub use run::{validate_test, PhonetResults, ValidStatus};

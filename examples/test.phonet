@@ -91,3 +91,22 @@ $N = [mn]
 
 # using lookbehind - should not register as class
 ! (?<=xxxx)
+
+# Multiline
+$Hello = &
+  a
+  |b
+;
+
+! &
+  helo
+;
+
+?+ &
+  hey
+  hello
+;
+
+?! &
+  helo
+;

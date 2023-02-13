@@ -26,7 +26,9 @@ $V = [aeiou]          ;# Vowels
 @* No repeated letters
   ! (.)\1             ;# This is an unnamed back-reference
   ! (?<x> .) \k<x>    ;# This is a named back-reference (NOT a class)
-    ?+ taso
-    ?! taaso ttaso
+    ?+ taso           ;# An example of multi-line statements on next line (comments cannot be on same line)
+    ?! &              
+      taaso
+      ttaso
 
 * 2 tests *should* have failed!

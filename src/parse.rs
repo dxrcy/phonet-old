@@ -4,6 +4,7 @@ use fancy_regex::Regex;
 use fancy_regex_macro::regex;
 
 use crate::{
+    statements::split_statements,
     types::{
         Classes,
         Error::{self, *},
@@ -93,192 +94,181 @@ impl Phonet {
         // Mode
         let mut mode: Option<Mode> = None;
 
-        // Split at line
-        for (line, line_statements) in file.lines().enumerate() {
-            // Line number (as in file)
-            let line = line + 1;
+        // Split file into statements
+        let statements = split_statements(file);
 
-            // Comment
-            if line_statements.trim().starts_with('#') {
+        for (statement, line) in statements {
+            let statement = statement.trim();
+
+            // Continue for blank
+            if statement.is_empty() {
                 continue;
             }
 
-            // Split line at semicolon
-            for statement in line_statements.split(';') {
-                let statement = statement.trim();
+            let mut chars = statement.chars();
 
-                // Continue for blank
-                if statement.is_empty() {
-                    continue;
-                }
+            if let Some(first) = chars.next() {
+                match first {
+                    // Comment
+                    '#' => continue,
 
-                let mut chars = statement.chars();
-
-                if let Some(first) = chars.next() {
-                    match first {
-                        // Comment
-                        '#' => continue,
-
-                        // Mode
-                        '~' => {
-                            if mode.is_some() {
-                                return Err(Error::ModeAlreadyDefined { line });
-                            }
-
-                            // Remove spaces
-                            while chars.as_str().starts_with(' ') {
-                                chars.next();
-                            }
-
-                            // Select mode
-                            let next = chars.next();
-                            let last = chars.last();
-                            mode = match (next, last) {
-                                (Some('<'), Some('>')) => Some(Mode::Romanized),
-                                (Some('/'), Some('/')) => Some(Mode::Broad),
-                                (Some('['), Some(']')) => Some(Mode::Narrow),
-
-                                _ => return Err(Error::InvalidMode { line }),
-                            };
+                    // Mode
+                    '~' => {
+                        if mode.is_some() {
+                            return Err(Error::ModeAlreadyDefined { line });
                         }
 
-                        // Class
-                        '$' => {
-                            let mut split = chars.as_str().split('=');
-
-                            // Get name
-                            let name = match split.next() {
-                                Some(x) => x.trim().to_string(),
-                                None => return Err(Error::NoClassName { line }),
-                            };
-
-                            // Check if name is valid
-                            if !regex!(r"^\w+$").is_match(&name).expect(
-                                "Failed checking regex match. This error should NEVER APPEAR!",
-                            ) {
-                                return Err(Error::InvalidClassName { name, line });
-                            }
-
-                            // Get value
-                            let value = match split.next() {
-                                Some(x) => x.trim(),
-                                None => return Err(Error::NoClassValue { name, line }),
-                            };
-
-                            // Check that class does not already exist
-                            if raw_classes.get(&name).is_some() {
-                                return Err(Error::ClassAlreadyExist { name, line });
-                            }
-
-                            // Add raw line
-                            mini.classes.push(format!(
-                                "${}={}",
-                                name,
-                                value.replace(' ', "").replace('⟨', "<").replace('⟩', ">")
-                            ));
-
-                            // Insert class
-                            // Wrap value in NON-CAPTURING GROUP (just in case)
-                            // This is non-capturing, for classes to work with back-references
-                            // otherwise classes would be inherently capturing, and count towards group index in back-reference
-                            raw_classes.insert(
-                                name.to_string(),
-                                format!("(?:{})", value.replace(' ', "")),
-                            );
+                        // Remove spaces
+                        while chars.as_str().starts_with(' ') {
+                            chars.next();
                         }
 
-                        // Rule
-                        '+' | '!' => {
-                            // `+` for true, `!` for false
-                            let intent = first != '!';
+                        // Select mode
+                        let next = chars.next();
+                        let last = chars.last();
+                        mode = match (next, last) {
+                            (Some('<'), Some('>')) => Some(Mode::Romanized),
+                            (Some('/'), Some('/')) => Some(Mode::Broad),
+                            (Some('['), Some(']')) => Some(Mode::Narrow),
 
-                            let pattern = chars.as_str().replace(' ', "");
-
-                            // Add rule for minify
-                            mini.rules.push(
-                                first.to_string() + &pattern.replace('⟨', "<").replace('⟩', ">"),
-                            );
-
-                            // Add rule
-                            rules.push(RawRule {
-                                intent,
-                                pattern,
-                                reason_ref,
-                                line,
-                            });
-                        }
-
-                        // Test
-                        '?' => {
-                            // Remove spaces
-                            while chars.as_str().starts_with(' ') {
-                                chars.next();
-                            }
-
-                            // Check intent
-                            // `+` for true, `!` for false
-                            let intent = match chars.next() {
-                                // Should be INVALID to pass
-                                Some('+') => true,
-                                // Should be VALID to pass
-                                Some('!') => false,
-
-                                // Unknown character
-                                Some(ch) => {
-                                    return Err(UnknownIntentIdentifier { ch, line });
-                                }
-                                // No character
-                                None => continue,
-                            };
-
-                            // Split at space
-                            let words = chars.as_str().split_whitespace();
-                            for word in words {
-                                let word = word.trim().to_string();
-
-                                // Add test for minify
-                                if intent {
-                                    mini.tests_pos.push(word.clone());
-                                } else {
-                                    mini.tests_neg.push(word.clone());
-                                }
-
-                                // Add test
-                                if !word.is_empty() {
-                                    tests.push(TestDefinition::Test { intent, word });
-                                }
-                            }
-                        }
-
-                        // Reason
-                        '@' => {
-                            // Remove spaces
-                            while chars.as_str().starts_with(' ') {
-                                chars.next();
-                            }
-
-                            // Reason note
-                            if chars.as_str().starts_with('*') {
-                                chars.next();
-                                tests.push(TestDefinition::Note(chars.as_str().trim().to_string()));
-                            }
-
-                            // Add reason
-                            reasons.push(chars.as_str().trim().to_string());
-                            reason_ref = Some(reasons.len() - 1);
-                        }
-
-                        // Note
-                        '*' => {
-                            let msg = chars.as_str().trim().to_string();
-                            if !msg.is_empty() {
-                                tests.push(TestDefinition::Note(msg));
-                            }
-                        }
-
-                        // Unknown
-                        _ => return Err(UnknownLineOperator { ch: first, line }),
+                            _ => return Err(Error::InvalidMode { line }),
+                        };
                     }
+
+                    // Class
+                    '$' => {
+                        let mut split = chars.as_str().split('=');
+
+                        // Get name
+                        let name = match split.next() {
+                            Some(x) => x.trim().to_string(),
+                            None => return Err(Error::NoClassName { line }),
+                        };
+
+                        // Check if name is valid
+                        if !regex!(r"^\w+$")
+                            .is_match(&name)
+                            .expect("Failed checking regex match. This error should NEVER APPEAR!")
+                        {
+                            return Err(Error::InvalidClassName { name, line });
+                        }
+
+                        // Get value
+                        let value = match split.next() {
+                            Some(x) => x.trim(),
+                            None => return Err(Error::NoClassValue { name, line }),
+                        };
+
+                        // Check that class does not already exist
+                        if raw_classes.get(&name).is_some() {
+                            return Err(Error::ClassAlreadyExist { name, line });
+                        }
+
+                        // Add raw line
+                        mini.classes.push(format!(
+                            "${}={}",
+                            name,
+                            value.replace(' ', "").replace('⟨', "<").replace('⟩', ">")
+                        ));
+
+                        // Insert class
+                        // Wrap value in NON-CAPTURING GROUP (just in case)
+                        // This is non-capturing, for classes to work with back-references
+                        // otherwise classes would be inherently capturing, and count towards group index in back-reference
+                        raw_classes
+                            .insert(name.to_string(), format!("(?:{})", value.replace(' ', "")));
+                    }
+
+                    // Rule
+                    '+' | '!' => {
+                        // `+` for true, `!` for false
+                        let intent = first != '!';
+
+                        let pattern = chars.as_str().replace(' ', "");
+
+                        // Add rule for minify
+                        mini.rules
+                            .push(first.to_string() + &pattern.replace('⟨', "<").replace('⟩', ">"));
+
+                        // Add rule
+                        rules.push(RawRule {
+                            intent,
+                            pattern,
+                            reason_ref,
+                            line,
+                        });
+                    }
+
+                    // Test
+                    '?' => {
+                        // Remove spaces
+                        while chars.as_str().starts_with(' ') {
+                            chars.next();
+                        }
+
+                        // Check intent
+                        // `+` for true, `!` for false
+                        let intent = match chars.next() {
+                            // Should be INVALID to pass
+                            Some('+') => true,
+                            // Should be VALID to pass
+                            Some('!') => false,
+
+                            // Unknown character
+                            Some(ch) => {
+                                return Err(UnknownIntentIdentifier { ch, line });
+                            }
+                            // No character
+                            None => continue,
+                        };
+
+                        // Split at space
+                        let words = chars.as_str().split_whitespace();
+                        for word in words {
+                            let word = word.trim().to_string();
+
+                            // Add test for minify
+                            if intent {
+                                mini.tests_pos.push(word.clone());
+                            } else {
+                                mini.tests_neg.push(word.clone());
+                            }
+
+                            // Add test
+                            if !word.is_empty() {
+                                tests.push(TestDefinition::Test { intent, word });
+                            }
+                        }
+                    }
+
+                    // Reason
+                    '@' => {
+                        // Remove spaces
+                        while chars.as_str().starts_with(' ') {
+                            chars.next();
+                        }
+
+                        // Reason note
+                        if chars.as_str().starts_with('*') {
+                            chars.next();
+                            tests.push(TestDefinition::Note(chars.as_str().trim().to_string()));
+                        }
+
+                        // Add reason
+                        reasons.push(chars.as_str().trim().to_string());
+                        reason_ref = Some(reasons.len() - 1);
+                    }
+
+                    // Note
+                    '*' => {
+                        let msg = chars.as_str().trim().to_string();
+                        if !msg.is_empty() {
+                            tests.push(TestDefinition::Note(msg));
+                        }
+                    }
+
+                    // Unknown
+                    _ => return Err(UnknownLineOperator { ch: first, line }),
                 }
             }
         }

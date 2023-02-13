@@ -1,0 +1,13 @@
+~<>
+
+$C = [kstnhmyrw]
+$V = [aiueo]
+
+$_ = [kstnhmyrwaiueo]
+
+$CV = {
+  []
+}
+
+@* Syllable structure
+  + ^ (⟨C⟩? ⟨V⟩ n?)+ $

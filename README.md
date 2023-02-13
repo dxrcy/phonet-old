@@ -435,6 +435,7 @@ $V = [aeiou]          ;# Vowels
 
 # TODO
 
+- Clean code!
 - Check all `.len()` calls on strings, check for non-ascii problems (use `.chars().count()`)
 - Add line number traceback to initial class substitution error
 - Print generated words separately
