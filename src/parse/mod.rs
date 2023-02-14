@@ -1,17 +1,20 @@
+/// Split file into statements
+mod statements;
+
 use std::collections::HashMap;
 
 use fancy_regex::Regex;
 use fancy_regex_macro::regex;
 
 use crate::{
-    statements::split_statements,
     types::{
         Classes,
         Error::{self, *},
         Rule, TestDefinition,
     },
-    PhonetResults,
+    Results,
 };
+use statements::split_statements;
 
 struct RawRule {
     pub intent: bool,
@@ -327,8 +330,8 @@ impl Phonet {
     }
 
     /// Run tests, return results
-    pub fn run(&self) -> PhonetResults {
-        PhonetResults::run(self)
+    pub fn run(&self) -> Results {
+        Results::run(self)
     }
 }
 

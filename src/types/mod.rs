@@ -1,10 +1,13 @@
+/// Holds error type
+mod error;
+
 use std::{collections::HashMap, fmt::Display};
 
 use clap::{builder::PossibleValue, ValueEnum};
 use fancy_regex::Regex;
 
-pub use crate::error::Error;
-pub use crate::run::Reason;
+pub use error::Error;
+pub use crate::run::FailReason;
 
 use DisplayLevel::*;
 
@@ -45,7 +48,7 @@ pub enum TestResult {
         /// Whether test passed or not
         pass: bool,
         /// Reason for fail
-        reason: Reason,
+        reason: FailReason,
     },
 }
 

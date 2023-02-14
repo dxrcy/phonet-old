@@ -4,7 +4,7 @@ use std::fs;
 
 use args::Args;
 use clap::Parser;
-use phonet::{types::TestDefinition, Phonet};
+use phonet::{TestDefinition, Phonet};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();

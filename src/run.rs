@@ -3,25 +3,25 @@ use crate::{
     DisplayLevel::{self, *},
     Phonet,
 };
-use Reason::*;
+use FailReason::*;
 use ValidStatus::*;
 
 /// Results from run tests
 ///
 /// Create with `PhonetResults::run()`
-pub struct PhonetResults {
+pub struct Results {
     /// List of results of each test
     pub list: Vec<TestResult>,
     /// Amount of failed tests
     pub fail_count: u32,
 }
 
-impl PhonetResults {
+impl Results {
     /// Run tests, return results
-    pub fn run(scheme: &Phonet) -> PhonetResults {
+    pub fn run(scheme: &Phonet) -> Results {
         // No tests
         if scheme.tests.is_empty() {
-            return PhonetResults {
+            return Results {
                 list: Vec::new(),
                 fail_count: 0,
             };
@@ -49,7 +49,7 @@ impl PhonetResults {
                     // Create reason
                     let reason = if !pass {
                         // Test failed - Some reason
-                        Reason::from(validity, &scheme.reasons)
+                        FailReason::from(validity, &scheme.reasons)
                     } else {
                         // Test passed - No reason for failure needed
                         Passed
@@ -76,7 +76,7 @@ impl PhonetResults {
             }
         }
 
-        PhonetResults { list, fail_count }
+        Results { list, fail_count }
     }
 
     /// Get maximum length of all test words
@@ -225,7 +225,7 @@ impl PhonetResults {
 }
 
 /// Reason for failure variants
-pub enum Reason {
+pub enum FailReason {
     /// Test passed, do not display reason
     Passed,
     /// No reason was given for rule for test failing
@@ -236,7 +236,7 @@ pub enum Reason {
     Custom(String),
 }
 
-impl Reason {
+impl FailReason {
     fn from(validity: ValidStatus, reasons: &[String]) -> Self {
         match validity {
             // Test was valid, but it should have been invalid
@@ -250,7 +250,7 @@ impl Reason {
                 // Find rule reason in scheme
                 Some(reason) => match reasons.get(reason) {
                     // Rule found - Custom reason
-                    Some(x) => Reason::Custom(x.to_string()),
+                    Some(x) => FailReason::Custom(x.to_string()),
                     // No rule found
                     // ? this should not happen ever ?
                     None => NoReasonGiven,

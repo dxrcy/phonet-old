@@ -2,7 +2,7 @@ use std::ops::Range;
 
 use rand::{seq::SliceRandom, Rng};
 
-use crate::{types::Error, validate_test, Phonet};
+use crate::{types::Error, run::validate_test, Phonet};
 
 impl Phonet {
     /// Generate random words that fit the rules
