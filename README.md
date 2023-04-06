@@ -1,5 +1,7 @@
 # Phonet
 
+# This repository is archived. *Phonet* has moved to [a new repo](https://github.com/darccyy/phonet)
+
 _Phonet_ is a CLI tool and library to validate phonotactic patterns for constructed languages.
 It is compatible with either romanization and phonetic transcription.
 Words can be randomly generated (see [Argument Syntax](#argument-syntax)).
